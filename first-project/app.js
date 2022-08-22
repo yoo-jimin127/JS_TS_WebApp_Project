@@ -7,11 +7,11 @@ const CONTENT_URL = 'https://api.hnpwa.com/v0/item/@id.json'; // 해당 콘텐�
 function getData(method, url, async) {
     ajax.open(method, url, async); // 동기 or 비동기 방식으로 서버 요청 값 처리
     ajax.send(); // 데이터를 가져오는 작업
+
+    return JSON.parse(ajax.response);
 }
 
-getData('GET', URL_ADDR, false);
-
-const newsFeed = JSON.parse(ajax.response); // json 데이터 객체 변환 후 리턴
+const newsFeed = getData('GET', URL_ADDR, false); // json 데이터 객체 변환 후 리턴
 const ul = document.createElement('ul'); // ul tag 생성
 
 window.addEventListener('hashchange', function() {
@@ -19,30 +19,31 @@ window.addEventListener('hashchange', function() {
     console.log(location.hash); // location 객체의 hash 값 확인 #3029303929 와 같은 방식으로 값 반환
 
     const id = location.hash.substr(1); // # 이후의 내용 저장
-    getData('GET', CONTENT_URL.replace('@id', id), false);
+    const newsContent = getData('GET', CONTENT_URL.replace('@id', id), false);
 
-    const newsContent = JSON.parse(ajax.response);
-    const title = document.createElement('h1');
+    container.innerHTML = `
+        <h1>${newsContent.title}</h1>
 
-    title.innerHTML = newsContent.title;
-    content.appendChild(title);
-    console.log(newsContent);
+        <div>
+            <a href="#">목록으로</a>
+        </div>
+    `;
 });
 
-for (let i = 0; i < 10; i++) {
-    const div = document.createElement('div');
+const newsList = []; // empty array
+newsList.push('<ul>');
 
-    div.innerHTML = 
+for (let i = 0; i < 10; i++) {
+    newsList.push(
     `
     <li>
         <a href="#${newsFeed[i].id}">
             ${newsFeed[i].title} (${newsFeed[i].comments_count})
         </a>
     </li>
-    `
-    // ul.appendChild(div.children[0]);
-    ul.appendChild(div.firstElementChild);
+    `);
 }
 
-container.appendChild(ul);
-container.appendChild(content);
+newsList.push('</ul>');
+
+container.innerHTML = newsList.join(''); // 배열의 내용을 하나의 문자열로 합쳐주는 함수 join() 사용, 기본 구분자 제거

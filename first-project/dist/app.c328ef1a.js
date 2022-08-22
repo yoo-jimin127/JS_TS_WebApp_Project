@@ -130,10 +130,11 @@ function getData(method, url, async) {
   ajax.open(method, url, async); // 동기 or 비동기 방식으로 서버 요청 값 처리
 
   ajax.send(); // 데이터를 가져오는 작업
+
+  return JSON.parse(ajax.response);
 }
 
-getData('GET', URL_ADDR, false);
-var newsFeed = JSON.parse(ajax.response); // json 데이터 객체 변환 후 리턴
+var newsFeed = getData('GET', URL_ADDR, false); // json 데이터 객체 변환 후 리턴
 
 var ul = document.createElement('ul'); // ul tag 생성
 
@@ -143,23 +144,19 @@ window.addEventListener('hashchange', function () {
 
   var id = location.hash.substr(1); // # 이후의 내용 저장
 
-  getData('GET', CONTENT_URL.replace('@id', id), false);
-  var newsContent = JSON.parse(ajax.response);
-  var title = document.createElement('h1');
-  title.innerHTML = newsContent.title;
-  content.appendChild(title);
-  console.log(newsContent);
+  var newsContent = getData('GET', CONTENT_URL.replace('@id', id), false);
+  container.innerHTML = "\n        <h1>".concat(newsContent.title, "</h1>\n\n        <div>\n            <a href=\"#\">\uBAA9\uB85D\uC73C\uB85C</a>\n        </div>\n    ");
 });
+var newsList = []; // empty array
+
+newsList.push('<ul>');
 
 for (var i = 0; i < 10; i++) {
-  var div = document.createElement('div');
-  div.innerHTML = "\n    <li>\n        <a href=\"#".concat(newsFeed[i].id, "\">\n            ").concat(newsFeed[i].title, " (").concat(newsFeed[i].comments_count, ")\n        </a>\n    </li>\n    "); // ul.appendChild(div.children[0]);
-
-  ul.appendChild(div.firstElementChild);
+  newsList.push("\n    <li>\n        <a href=\"#".concat(newsFeed[i].id, "\">\n            ").concat(newsFeed[i].title, " (").concat(newsFeed[i].comments_count, ")\n        </a>\n    </li>\n    "));
 }
 
-container.appendChild(ul);
-container.appendChild(content);
+newsList.push('</ul>');
+container.innerHTML = newsList.join(''); // 배열의 내용을 하나의 문자열로 합쳐주는 함수 join() 사용, 기본 구분자 제거
 },{}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
