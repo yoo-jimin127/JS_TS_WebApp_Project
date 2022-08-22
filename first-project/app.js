@@ -1,4 +1,5 @@
 const ajax = new XMLHttpRequest(); // ajax 출력 결과 반환
+const content = document.createElement('div');
 const URL_ADDR = 'https://api.hnpwa.com/v0/news/1.json';
 const CONTENT_URL = 'https://api.hnpwa.com/v0/item/@id.json'; // 해당 콘텐츠의 url
 
@@ -6,7 +7,6 @@ ajax.open('GET', URL_ADDR, false); // 동기적으로 서버 요청 값 처리
 ajax.send(); // 데이터를 가져오는 작업
 
 const newsFeed = JSON.parse(ajax.response); // json 데이터 객체 변환 후 리턴
-
 const ul = document.createElement('ul'); // ul tag 생성
 
 window.addEventListener('hashchange', function() {
@@ -18,6 +18,10 @@ window.addEventListener('hashchange', function() {
     ajax.send(); // 데이터 가져오기
 
     const newsContent = JSON.parse(ajax.response);
+    const title = document.createElement('h1');
+
+    title.innerHTML = newsContent.title;
+    content.appendChild(title);
     console.log(newsContent);
 });
 
@@ -33,3 +37,4 @@ for (let i = 0; i < 10; i++) {
 }
 
 document.getElementById('root').appendChild(ul);
+document.getElementById('root').appendChild(content);

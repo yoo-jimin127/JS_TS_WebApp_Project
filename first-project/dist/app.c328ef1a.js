@@ -120,6 +120,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 })({"app.js":[function(require,module,exports) {
 var ajax = new XMLHttpRequest(); // ajax 출력 결과 반환
 
+var content = document.createElement('div');
 var URL_ADDR = 'https://api.hnpwa.com/v0/news/1.json';
 var CONTENT_URL = 'https://api.hnpwa.com/v0/item/@id.json'; // 해당 콘텐츠의 url
 
@@ -141,6 +142,9 @@ window.addEventListener('hashchange', function () {
   ajax.send(); // 데이터 가져오기
 
   var newsContent = JSON.parse(ajax.response);
+  var title = document.createElement('h1');
+  title.innerHTML = newsContent.title;
+  content.appendChild(title);
   console.log(newsContent);
 });
 
@@ -155,6 +159,7 @@ for (var i = 0; i < 10; i++) {
 }
 
 document.getElementById('root').appendChild(ul);
+document.getElementById('root').appendChild(content);
 },{}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
