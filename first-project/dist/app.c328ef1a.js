@@ -118,6 +118,8 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 
   return newRequire;
 })({"app.js":[function(require,module,exports) {
+var container = document.getElementById('root'); // find root tag
+
 var ajax = new XMLHttpRequest(); // ajax 출력 결과 반환
 
 var content = document.createElement('div');
@@ -158,8 +160,8 @@ for (var i = 0; i < 10; i++) {
   ul.appendChild(li);
 }
 
-document.getElementById('root').appendChild(ul);
-document.getElementById('root').appendChild(content);
+container.appendChild(ul);
+container.appendChild(content);
 },{}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';

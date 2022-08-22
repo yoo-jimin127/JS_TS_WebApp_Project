@@ -1,3 +1,4 @@
+const container = document.getElementById('root'); // find root tag
 const ajax = new XMLHttpRequest(); // ajax 출력 결과 반환
 const content = document.createElement('div');
 const URL_ADDR = 'https://api.hnpwa.com/v0/news/1.json';
@@ -36,5 +37,5 @@ for (let i = 0; i < 10; i++) {
     ul.appendChild(li);
 }
 
-document.getElementById('root').appendChild(ul);
-document.getElementById('root').appendChild(content);
+container.appendChild(ul);
+container.appendChild(content);
