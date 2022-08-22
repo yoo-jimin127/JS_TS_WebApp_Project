@@ -151,13 +151,10 @@ window.addEventListener('hashchange', function () {
 });
 
 for (var i = 0; i < 10; i++) {
-  var li = document.createElement('li');
-  var a = document.createElement('a');
-  a.href = "#".concat(newsFeed[i].id);
-  a.innerHTML = "".concat(newsFeed[i].title, " (").concat(newsFeed[i].comments_count, ")"); // title & comments_count
+  var div = document.createElement('div');
+  div.innerHTML = "\n    <li>\n        <a href=\"#".concat(newsFeed[i].id, "\">\n            ").concat(newsFeed[i].title, " (").concat(newsFeed[i].comments_count, ")\n        </a>\n    </li>\n    "); // ul.appendChild(div.children[0]);
 
-  li.appendChild(a);
-  ul.appendChild(li);
+  ul.appendChild(div.firstElementChild);
 }
 
 container.appendChild(ul);

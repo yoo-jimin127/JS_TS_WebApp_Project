@@ -54,4 +54,24 @@
     - `#` : 앵커 태그에 디폴트로 넣어둔 북마크(#)
         - `hashchange`이벤트 : 링크 또는 타이틀의 클릭 처리를 바탕으로 ajax 통신 & id 값 get
     - `location`객체 : 브라우저가 제공하는 주소와 관련된 다양한 정보를 제공하는 객체
-    
+
+## 문자열로 ui 구성
+- HTML으로 만들어진 ui는 파악이 어렵다는 단점 존재
+    - DOM API를 사용해 ui의 구조가 잘 드러나지 않는 문제점 해결법 : DOM API 사용을 최소화하자
+```js
+for (let i = 0; i < 10; i++) {
+    const div = document.createElement('div');
+
+    div.innerHTML = 
+    `
+    <li>
+        <a href="#${newsFeed[i].id}">
+            ${newsFeed[i].title} (${newsFeed[i].comments_count})
+        </a>
+    </li>
+    `
+    ul.appendChild(div.children[0]); // children : array, idx 0 children call
+    // ul.appendChild(div.firstElementChild);
+}
+```
+- DOM API 사용을 최소화하여 직관적인 ui 구조를 구현 -> 코드 직관성을 높이기
