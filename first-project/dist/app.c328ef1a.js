@@ -134,11 +134,22 @@ function getData(method, url, async) {
   return JSON.parse(ajax.response);
 }
 
-var newsFeed = getData('GET', URL_ADDR, false); // json 데이터 객체 변환 후 리턴
+function getNewsFeed() {
+  var newsFeed = getData('GET', URL_ADDR, false); // json 데이터 객체 변환 후 리턴
 
-var ul = document.createElement('ul'); // ul tag 생성
+  var newsList = []; // empty array
 
-window.addEventListener('hashchange', function () {
+  newsList.push('<ul>');
+
+  for (var i = 0; i < 10; i++) {
+    newsList.push("\n        <li>\n            <a href=\"#".concat(newsFeed[i].id, "\">\n                ").concat(newsFeed[i].title, " (").concat(newsFeed[i].comments_count, ")\n            </a>\n        </li>\n        "));
+  }
+
+  newsList.push('</ul>');
+  container.innerHTML = newsList.join(''); // 배열의 내용을 하나의 문자열로 합쳐주는 함수 join() 사용, 기본 구분자 제거
+}
+
+function newsDetail() {
   console.log('hash changed');
   console.log(location.hash); // location 객체의 hash 값 확인 #3029303929 와 같은 방식으로 값 반환
 
@@ -146,17 +157,22 @@ window.addEventListener('hashchange', function () {
 
   var newsContent = getData('GET', CONTENT_URL.replace('@id', id), false);
   container.innerHTML = "\n        <h1>".concat(newsContent.title, "</h1>\n\n        <div>\n            <a href=\"#\">\uBAA9\uB85D\uC73C\uB85C</a>\n        </div>\n    ");
-});
-var newsList = []; // empty array
-
-newsList.push('<ul>');
-
-for (var i = 0; i < 10; i++) {
-  newsList.push("\n    <li>\n        <a href=\"#".concat(newsFeed[i].id, "\">\n            ").concat(newsFeed[i].title, " (").concat(newsFeed[i].comments_count, ")\n        </a>\n    </li>\n    "));
 }
 
-newsList.push('</ul>');
-container.innerHTML = newsList.join(''); // 배열의 내용을 하나의 문자열로 합쳐주는 함수 join() 사용, 기본 구분자 제거
+function router() {
+  var routePath = location.hash;
+
+  if (routePath === '') {
+    // location.hash === # 일 경우 빈 값 반환
+    getNewsFeed();
+  } else {
+    newsDetail();
+  }
+}
+
+window.addEventListener('hashchange', router); // router : hash의 변경마다 보여줌
+
+router();
 },{}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';

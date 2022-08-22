@@ -11,10 +11,28 @@ function getData(method, url, async) {
     return JSON.parse(ajax.response);
 }
 
-const newsFeed = getData('GET', URL_ADDR, false); // json 데이터 객체 변환 후 리턴
-const ul = document.createElement('ul'); // ul tag 생성
+function getNewsFeed() {
+    const newsFeed = getData('GET', URL_ADDR, false); // json 데이터 객체 변환 후 리턴
+    const newsList = []; // empty array
+    newsList.push('<ul>');
+    
+    for (let i = 0; i < 10; i++) {
+        newsList.push(
+        `
+        <li>
+            <a href="#${newsFeed[i].id}">
+                ${newsFeed[i].title} (${newsFeed[i].comments_count})
+            </a>
+        </li>
+        `);
+    }
+    
+    newsList.push('</ul>');
+    
+    container.innerHTML = newsList.join(''); // 배열의 내용을 하나의 문자열로 합쳐주는 함수 join() 사용, 기본 구분자 제거
+}
 
-window.addEventListener('hashchange', function() {
+function newsDetail() {
     console.log('hash changed')
     console.log(location.hash); // location 객체의 hash 값 확인 #3029303929 와 같은 방식으로 값 반환
 
@@ -28,22 +46,19 @@ window.addEventListener('hashchange', function() {
             <a href="#">목록으로</a>
         </div>
     `;
-});
-
-const newsList = []; // empty array
-newsList.push('<ul>');
-
-for (let i = 0; i < 10; i++) {
-    newsList.push(
-    `
-    <li>
-        <a href="#${newsFeed[i].id}">
-            ${newsFeed[i].title} (${newsFeed[i].comments_count})
-        </a>
-    </li>
-    `);
 }
 
-newsList.push('</ul>');
+function router() {
+    const routePath = location.hash;
 
-container.innerHTML = newsList.join(''); // 배열의 내용을 하나의 문자열로 합쳐주는 함수 join() 사용, 기본 구분자 제거
+    if(routePath === '') {
+        // location.hash === # 일 경우 빈 값 반환
+        getNewsFeed();
+    }
+    else {
+        newsDetail();
+    }
+}
+
+window.addEventListener('hashchange', router); // router : hash의 변경마다 보여줌
+router();
