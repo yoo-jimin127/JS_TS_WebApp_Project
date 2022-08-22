@@ -22,3 +22,14 @@
     
     - `ajax.send();` : 데이터를 가져오는 작업
     - `ajax.response` : ajax로부터 불러온 데이터가 저장된 위치
+
+- javascript 상에서 html 코드 추가 : `document.getElementById('root').innerHTML`
+    - ex) ```js
+    document.getElementById('root').innerHTML = 
+        `<ul>
+            <li>${newsFeed[0].title}</li>
+            <li>${newsFeed[1].title}</li>
+            <li>${newsFeed[2].title}</li>
+        </ul>`;
+    ```
+
