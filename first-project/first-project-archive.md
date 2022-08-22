@@ -14,4 +14,11 @@
 
     - `ajax.open('GET', 'https://api.hnpwa.com/v0/news/1.json', false);`
         - `ajax.open(method, url, async, user(option), psw(option))` : 요청 내용 구체화
-            - 첫 번째 인자 : 
+            - method (필수) : 요청 방식 `get` or `post`
+            - url (필수) : 불러올 파일 주소
+            - async (필수) : true(비동기), false(동기)
+                - 서버 요청 : true(비동기)로 보낼 것
+                    - 비동기로 서버 요청 전송 시 javascript에서 서버 응답을 기다리지 않고 작업 수행 후 서버 응답이 준비될 경우 응답 처리 수행 
+    
+    - `ajax.send();` : 데이터를 가져오는 작업
+    - `ajax.response` : ajax로부터 불러온 데이터가 저장된 위치

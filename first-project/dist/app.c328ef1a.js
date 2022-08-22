@@ -118,7 +118,13 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 
   return newRequire;
 })({"app.js":[function(require,module,exports) {
+var ajax = new XMLHttpRequest(); // ajax 출력 결과 반환
 
+ajax.open('GET', 'https://api.hnpwa.com/v0/news/1.json', false); // 동기적으로 서버 요청 값 처리
+
+ajax.send(); // 데이터를 가져오는 작업
+
+console.log(ajax.response); // 가져온 데이터 확인
 },{}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -147,7 +153,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49498" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49635" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
