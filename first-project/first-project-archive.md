@@ -32,4 +32,16 @@
             <li>${newsFeed[2].title}</li>
         </ul>`;
     ```
+    - 코드 수정 :
+        ```js
+            const ul = document.createElement('ul');
+
+            for (let i = 0; i < 10; i++) {
+                const li = document.createElement('li');
+                li.innerHTML = `<li>${newsFeed[i].title}</li>`
+                ul.appendChild(li);
+            }
+
+            document.getElementById('root').appendChild(ul);
+        ```
 

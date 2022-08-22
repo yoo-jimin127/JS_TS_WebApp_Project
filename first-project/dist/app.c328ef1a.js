@@ -128,7 +128,15 @@ ajax.send(); // 데이터를 가져오는 작업
 var newsFeed = JSON.parse(ajax.response); // json 데이터 객체 변환 후 리턴
 // console.log(newsFeed);
 
-document.getElementById('root').innerHTML = "<ul>\n    <li>".concat(newsFeed[0].title, "</li>\n    <li>").concat(newsFeed[1].title, "</li>\n    <li>").concat(newsFeed[2].title, "</li>\n</ul>");
+var ul = document.createElement('ul'); // ul tag 생성
+
+for (var i = 0; i < 10; i++) {
+  var li = document.createElement('li');
+  li.innerHTML = "<li>".concat(newsFeed[i].title, "</li>");
+  ul.appendChild(li);
+}
+
+document.getElementById('root').appendChild(ul);
 },{}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';

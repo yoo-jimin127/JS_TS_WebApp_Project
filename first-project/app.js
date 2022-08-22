@@ -8,9 +8,12 @@ ajax.send(); // 데이터를 가져오는 작업
 const newsFeed = JSON.parse(ajax.response); // json 데이터 객체 변환 후 리턴
 // console.log(newsFeed);
 
-document.getElementById('root').innerHTML = 
-`<ul>
-    <li>${newsFeed[0].title}</li>
-    <li>${newsFeed[1].title}</li>
-    <li>${newsFeed[2].title}</li>
-</ul>`;
+const ul = document.createElement('ul'); // ul tag 생성
+
+for (let i = 0; i < 10; i++) {
+    const li = document.createElement('li');
+    li.innerHTML = `<li>${newsFeed[i].title}</li>`
+    ul.appendChild(li);
+}
+
+document.getElementById('root').appendChild(ul);
