@@ -24,24 +24,26 @@
     - `ajax.response` : ajax로부터 불러온 데이터가 저장된 위치
 
 - javascript 상에서 html 코드 추가 : `document.getElementById('root').innerHTML`
-    - ex) ```js
-    document.getElementById('root').innerHTML = 
+    - ex) 
+    ```js
+            document.getElementById('root').innerHTML = 
         `<ul>
             <li>${newsFeed[0].title}</li>
             <li>${newsFeed[1].title}</li>
             <li>${newsFeed[2].title}</li>
         </ul>`;
     ```
+
     - 코드 수정 :
-        ```js
-            const ul = document.createElement('ul');
+    ```js
+        const ul = document.createElement('ul');
 
-            for (let i = 0; i < 10; i++) {
-                const li = document.createElement('li');
-                li.innerHTML = `<li>${newsFeed[i].title}</li>`
-                ul.appendChild(li);
-            }
+        for (let i = 0; i < 10; i++) {
+            const li = document.createElement('li');
+            li.innerHTML = `<li>${newsFeed[i].title}</li>`
+            ul.appendChild(li);
+        }
 
-            document.getElementById('root').appendChild(ul);
-        ```
+        document.getElementById('root').appendChild(ul);
+    ```
 
