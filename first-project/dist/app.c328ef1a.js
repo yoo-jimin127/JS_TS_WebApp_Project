@@ -121,19 +121,36 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 var ajax = new XMLHttpRequest(); // ajax 출력 결과 반환
 
 var URL_ADDR = 'https://api.hnpwa.com/v0/news/1.json';
+var CONTENT_URL = 'https://api.hnpwa.com/v0/item/@id.json'; // 해당 콘텐츠의 url
+
 ajax.open('GET', URL_ADDR, false); // 동기적으로 서버 요청 값 처리
 
 ajax.send(); // 데이터를 가져오는 작업
-// console.log(ajax.response);
 
 var newsFeed = JSON.parse(ajax.response); // json 데이터 객체 변환 후 리턴
-// console.log(newsFeed);
 
 var ul = document.createElement('ul'); // ul tag 생성
 
+window.addEventListener('hashchange', function () {
+  console.log('hash changed');
+  console.log(location.hash); // location 객체의 hash 값 확인 #3029303929 와 같은 방식으로 값 반환
+
+  var id = location.hash.substr(1); // # 이후의 내용 저장
+
+  ajax.open('GET', CONTENT_URL.replace('@id', id), false);
+  ajax.send(); // 데이터 가져오기
+
+  var newsContent = JSON.parse(ajax.response);
+  console.log(newsContent);
+});
+
 for (var i = 0; i < 10; i++) {
   var li = document.createElement('li');
-  li.innerHTML = "<li>".concat(newsFeed[i].title, "</li>");
+  var a = document.createElement('a');
+  a.href = "#".concat(newsFeed[i].id);
+  a.innerHTML = "".concat(newsFeed[i].title, " (").concat(newsFeed[i].comments_count, ")"); // title & comments_count
+
+  li.appendChild(a);
   ul.appendChild(li);
 }
 

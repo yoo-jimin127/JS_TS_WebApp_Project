@@ -40,10 +40,18 @@
 
         for (let i = 0; i < 10; i++) {
             const li = document.createElement('li');
-            li.innerHTML = `<li>${newsFeed[i].title}</li>`
+            li.innerHTML = newsFeed[i].title;
             ul.appendChild(li);
         }
 
         document.getElementById('root').appendChild(ul);
     ```
 
+### 여러개의 페이지를 가진 웹앱
+- SPA : 현재 액티브한 화면을 전환을 통해 페이지로 보여주는 원리
+- 이벤트 : 코드 상으로 특정 코드의 실행을 확정할 수 없는 경우, 특정 조건에 따라 실행되는 처리
+    - **브라우저가 제공**하는 이벤트 시스템
+    - `#` : 앵커 태그에 디폴트로 넣어둔 북마크(#)
+        - `hashchange`이벤트 : 링크 또는 타이틀의 클릭 처리를 바탕으로 ajax 통신 & id 값 get
+    - `location`객체 : 브라우저가 제공하는 주소와 관련된 다양한 정보를 제공하는 객체
+    
