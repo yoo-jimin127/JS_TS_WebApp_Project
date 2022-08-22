@@ -126,10 +126,13 @@ var content = document.createElement('div');
 var URL_ADDR = 'https://api.hnpwa.com/v0/news/1.json';
 var CONTENT_URL = 'https://api.hnpwa.com/v0/item/@id.json'; // 해당 콘텐츠의 url
 
-ajax.open('GET', URL_ADDR, false); // 동기적으로 서버 요청 값 처리
+function getData(method, url, async) {
+  ajax.open(method, url, async); // 동기 or 비동기 방식으로 서버 요청 값 처리
 
-ajax.send(); // 데이터를 가져오는 작업
+  ajax.send(); // 데이터를 가져오는 작업
+}
 
+getData('GET', URL_ADDR, false);
 var newsFeed = JSON.parse(ajax.response); // json 데이터 객체 변환 후 리턴
 
 var ul = document.createElement('ul'); // ul tag 생성
@@ -140,9 +143,7 @@ window.addEventListener('hashchange', function () {
 
   var id = location.hash.substr(1); // # 이후의 내용 저장
 
-  ajax.open('GET', CONTENT_URL.replace('@id', id), false);
-  ajax.send(); // 데이터 가져오기
-
+  getData('GET', CONTENT_URL.replace('@id', id), false);
   var newsContent = JSON.parse(ajax.response);
   var title = document.createElement('h1');
   title.innerHTML = newsContent.title;

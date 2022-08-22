@@ -4,8 +4,12 @@ const content = document.createElement('div');
 const URL_ADDR = 'https://api.hnpwa.com/v0/news/1.json';
 const CONTENT_URL = 'https://api.hnpwa.com/v0/item/@id.json'; // 해당 콘텐츠의 url
 
-ajax.open('GET', URL_ADDR, false); // 동기적으로 서버 요청 값 처리
-ajax.send(); // 데이터를 가져오는 작업
+function getData(method, url, async) {
+    ajax.open(method, url, async); // 동기 or 비동기 방식으로 서버 요청 값 처리
+    ajax.send(); // 데이터를 가져오는 작업
+}
+
+getData('GET', URL_ADDR, false);
 
 const newsFeed = JSON.parse(ajax.response); // json 데이터 객체 변환 후 리턴
 const ul = document.createElement('ul'); // ul tag 생성
@@ -15,8 +19,7 @@ window.addEventListener('hashchange', function() {
     console.log(location.hash); // location 객체의 hash 값 확인 #3029303929 와 같은 방식으로 값 반환
 
     const id = location.hash.substr(1); // # 이후의 내용 저장
-    ajax.open('GET', CONTENT_URL.replace('@id', id), false);
-    ajax.send(); // 데이터 가져오기
+    getData('GET', CONTENT_URL.replace('@id', id), false);
 
     const newsContent = JSON.parse(ajax.response);
     const title = document.createElement('h1');
