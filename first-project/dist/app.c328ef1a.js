@@ -172,7 +172,7 @@ function router() {
     // location.hash === # 일 경우 빈 값 반환
     getNewsFeed();
   } else if (routePath.indexOf('#/page/') >= 0) {
-    store.currentPage = 2;
+    store.currentPage = Number(routePath.substr(7));
     getNewsFeed();
   } else {
     newsDetail();

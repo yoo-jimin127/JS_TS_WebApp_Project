@@ -67,7 +67,7 @@ function router() {
         getNewsFeed();
     }
     else if (routePath.indexOf('#/page/') >= 0) {
-        store.currentPage = 2;
+        store.currentPage = Number(routePath.substr(7));
         getNewsFeed();
     }
     else {
