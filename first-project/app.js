@@ -4,6 +4,11 @@ const content = document.createElement('div');
 const URL_ADDR = 'https://api.hnpwa.com/v0/news/1.json';
 const CONTENT_URL = 'https://api.hnpwa.com/v0/item/@id.json'; // 해당 콘텐츠의 url
 
+// 공유 자원 관리
+const store = {
+    currentPage : 1,
+};
+
 function getData(method, url, async) {
     ajax.open(method, url, async); // 동기 or 비동기 방식으로 서버 요청 값 처리
     ajax.send(); // 데이터를 가져오는 작업
@@ -16,11 +21,11 @@ function getNewsFeed() {
     const newsList = []; // empty array
     newsList.push('<ul>');
     
-    for (let i = 0; i < 10; i++) {
+    for (let i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
         newsList.push(
         `
         <li>
-            <a href="#${newsFeed[i].id}">
+            <a href="#/show/${newsFeed[i].id}">
                 ${newsFeed[i].title} (${newsFeed[i].comments_count})
             </a>
         </li>
@@ -28,6 +33,12 @@ function getNewsFeed() {
     }
     
     newsList.push('</ul>');
+    newsList.push(`
+    <div>
+        <a href="#/page/${store.currentPage - 1}">이전 페이지</a>
+        <a href="#/page/${store.currentPage + 1}">다음 페이지</a>
+    </div>
+    `);
     
     container.innerHTML = newsList.join(''); // 배열의 내용을 하나의 문자열로 합쳐주는 함수 join() 사용, 기본 구분자 제거
 }
@@ -53,6 +64,10 @@ function router() {
 
     if(routePath === '') {
         // location.hash === # 일 경우 빈 값 반환
+        getNewsFeed();
+    }
+    else if (routePath.indexOf('#/page/') >= 0) {
+        store.currentPage = 2;
         getNewsFeed();
     }
     else {
