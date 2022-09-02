@@ -35,7 +35,7 @@ function getNewsFeed() {
     newsList.push('</ul>');
     newsList.push(`
     <div>
-        <a href="#/page/${store.currentPage - 1}">이전 페이지</a>
+        <a href="#/page/${store.currentPage > 1 ? store.currentPage - 1 : 1}">이전 페이지</a>
         <a href="#/page/${store.currentPage + 1}">다음 페이지</a>
     </div>
     `);
@@ -47,14 +47,14 @@ function newsDetail() {
     console.log('hash changed')
     console.log(location.hash); // location 객체의 hash 값 확인 #3029303929 와 같은 방식으로 값 반환
 
-    const id = location.hash.substr(1); // # 이후의 내용 저장
+    const id = location.hash.substr(7); // # 이후의 내용 저장
     const newsContent = getData('GET', CONTENT_URL.replace('@id', id), false);
 
     container.innerHTML = `
         <h1>${newsContent.title}</h1>
 
         <div>
-            <a href="#">목록으로</a>
+            <a href="#/page/${store.currentPage}">목록으로</a>
         </div>
     `;
 }

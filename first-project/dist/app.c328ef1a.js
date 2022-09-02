@@ -151,7 +151,7 @@ function getNewsFeed() {
   }
 
   newsList.push('</ul>');
-  newsList.push("\n    <div>\n        <a href=\"#/page/".concat(store.currentPage - 1, "\">\uC774\uC804 \uD398\uC774\uC9C0</a>\n        <a href=\"#/page/").concat(store.currentPage + 1, "\">\uB2E4\uC74C \uD398\uC774\uC9C0</a>\n    </div>\n    "));
+  newsList.push("\n    <div>\n        <a href=\"#/page/".concat(store.currentPage > 1 ? store.currentPage - 1 : 1, "\">\uC774\uC804 \uD398\uC774\uC9C0</a>\n        <a href=\"#/page/").concat(store.currentPage + 1, "\">\uB2E4\uC74C \uD398\uC774\uC9C0</a>\n    </div>\n    "));
   container.innerHTML = newsList.join(''); // 배열의 내용을 하나의 문자열로 합쳐주는 함수 join() 사용, 기본 구분자 제거
 }
 
@@ -159,10 +159,10 @@ function newsDetail() {
   console.log('hash changed');
   console.log(location.hash); // location 객체의 hash 값 확인 #3029303929 와 같은 방식으로 값 반환
 
-  var id = location.hash.substr(1); // # 이후의 내용 저장
+  var id = location.hash.substr(7); // # 이후의 내용 저장
 
   var newsContent = getData('GET', CONTENT_URL.replace('@id', id), false);
-  container.innerHTML = "\n        <h1>".concat(newsContent.title, "</h1>\n\n        <div>\n            <a href=\"#\">\uBAA9\uB85D\uC73C\uB85C</a>\n        </div>\n    ");
+  container.innerHTML = "\n        <h1>".concat(newsContent.title, "</h1>\n\n        <div>\n            <a href=\"#/page/").concat(store.currentPage, "\">\uBAA9\uB85D\uC73C\uB85C</a>\n        </div>\n    ");
 }
 
 function router() {
