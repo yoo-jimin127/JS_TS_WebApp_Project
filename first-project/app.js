@@ -20,7 +20,7 @@ function getNewsFeed() {
     const newsFeed = getData('GET', URL_ADDR, false); // json 데이터 객체 변환 후 리턴
     const newsList = []; // empty array
     let template = `
-        <div>
+        <div class="container mx-auto p-4">
         <h1>Hacker News</h1>
             <ul>
                 {{__news_feed__}}

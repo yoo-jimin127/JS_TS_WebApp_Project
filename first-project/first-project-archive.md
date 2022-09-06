@@ -109,3 +109,11 @@ for (let i = 0; i < 10; i++) {
 ```
 - DOM API 사용하는 것보다 명확한 구조의 확인 가능
 - 코드의 분리를 통해 복잡도 감소
+
+- 템플릿 한계점 : 마킹된 값의 개수만큼 replace 필요
+    - 마킹된 데이터와 복잡도 비례
+    - `handlebars` 라이브러리 등 템플릿 라이브러리 제공
+
+### tailwind.css
+- class로 접근하는 방법
+    - ex) margin : m 축약 표기(x axis : mx, y axis : my), padding : p 축약 표기(padding-top: pt, padding-bottom: pb)
