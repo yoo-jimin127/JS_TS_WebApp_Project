@@ -167,7 +167,23 @@ function newsDetail() {
 
   var newsContent = getData('GET', CONTENT_URL.replace('@id', id), false);
   var template = "\n    <div class=\"bg-gray-600 min-h-screen pb-8\">\n        <div class=\"bg-white text-xl\">\n            <div class=\"mx-auto px-4\">\n                <div class=\"flex justify-between tiems-center py-6\">\n                    <div class=\"flex justify-start\">\n                        <h1 class=\"font-extrabold\">Hacker News</h1>\n                    </div>\n                    <div class=\"items-center justify-end\">\n                        <a href=\"#/page/".concat(store.currentPage, "\" class=\"text-gray-500\">\n                            <i class=\"fa fa-times\"></i>\n                        </a>\n                    </div>\n                </div>\n            </div>\n        </div>\n\n        <div class=\"h-full border rounded-xl bg-white m-6 p-4\">\n            <h2>").concat(newsContent.title, "</h2>\n            <div class=\"text-gray-400 h-20\">\n                ").concat(newsContent.content, "\n            </div>\n\n            {{__comments__}}\n        </div>\n    </div>\n    ");
-  container.innerHTML = template;
+  /** comment function */
+
+  function makeComment(comments) {
+    var commentString = []; //comment array
+
+    for (var i = 0; i < comments.length; i++) {
+      commentString.push("\n                <div style=\"padding-left: 40px;\" class=\"mt-4\">\n                    <div class=\"text-gray-400\">\n                        <i class=\"fa fa-sort-up mr-2\"></i>\n                        <strong>".concat(comments[i].user, "</strong> ").concat(comments[i].time_ago, "\n                    </div>\n                    <p class=\"text-gray-700\">").concat(comments[i].content, "</p>\n                </div>\n            ")); // 대댓글 처리
+
+      if (comments[i].comments.length > 0) {
+        commentString.push(makeComment(comments[i].comments));
+      }
+    }
+
+    return commentString.join('');
+  }
+
+  container.innerHTML = template.replace('{{__comments__}}', makeComment(newsContent.comments));
 }
 
 function router() {
