@@ -19,6 +19,19 @@ function getData(method, url, async) {
 function getNewsFeed() {
     const newsFeed = getData('GET', URL_ADDR, false); // json 데이터 객체 변환 후 리턴
     const newsList = []; // empty array
+    let template = `
+        <div>
+        <h1>Hacker News</h1>
+            <ul>
+                {{__news_feed__}}
+            </ul>
+            <div>
+                <a href="#/page/{{__prev_page__}}">이전 페이지</a>
+                <a href="#/page/{{__next_page__}}">다음 페이지</a>
+            </div>
+        </div>
+    `;
+
     newsList.push('<ul>');
     
     for (let i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
