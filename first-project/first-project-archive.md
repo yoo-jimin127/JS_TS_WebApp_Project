@@ -117,3 +117,30 @@ for (let i = 0; i < 10; i++) {
 ### tailwind.css
 - class로 접근하는 방법
     - ex) margin : m 축약 표기(x axis : mx, y axis : my), padding : p 축약 표기(padding-top: pt, padding-bottom: pb)
+
+```js
+    /** comment function */
+    function makeComment(comments, called = 0) {
+        const commentString = []; //comment array
+
+        for (let i = 0; i < comments.length; i++) {
+            commentString.push(`
+                <div style="padding-left: ${called * 40}px;" class="mt-4">
+                    <div class="text-gray-400">
+                        <i class="fa fa-sort-up mr-2"></i>
+                        <strong>${comments[i].user}</strong> ${comments[i].time_ago}
+                    </div>
+                    <p class="text-gray-700">${comments[i].content}</p>
+                </div>
+            `);
+            
+            // 대댓글 처리
+            if (comments[i].comments.length > 0) {
+                commentString.push(makeComment(comments[i].comments, called + 1));
+            }
+        }
+
+        return commentString.join('');
+    }
+```
+ - 함수 인자 접근을 통한 차등 스타일링 적용

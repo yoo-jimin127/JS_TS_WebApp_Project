@@ -170,13 +170,14 @@ function newsDetail() {
   /** comment function */
 
   function makeComment(comments) {
+    var called = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
     var commentString = []; //comment array
 
     for (var i = 0; i < comments.length; i++) {
-      commentString.push("\n                <div style=\"padding-left: 40px;\" class=\"mt-4\">\n                    <div class=\"text-gray-400\">\n                        <i class=\"fa fa-sort-up mr-2\"></i>\n                        <strong>".concat(comments[i].user, "</strong> ").concat(comments[i].time_ago, "\n                    </div>\n                    <p class=\"text-gray-700\">").concat(comments[i].content, "</p>\n                </div>\n            ")); // 대댓글 처리
+      commentString.push("\n                <div style=\"padding-left: ".concat(called * 40, "px;\" class=\"mt-4\">\n                    <div class=\"text-gray-400\">\n                        <i class=\"fa fa-sort-up mr-2\"></i>\n                        <strong>").concat(comments[i].user, "</strong> ").concat(comments[i].time_ago, "\n                    </div>\n                    <p class=\"text-gray-700\">").concat(comments[i].content, "</p>\n                </div>\n            ")); // 대댓글 처리
 
       if (comments[i].comments.length > 0) {
-        commentString.push(makeComment(comments[i].comments));
+        commentString.push(makeComment(comments[i].comments, called + 1));
       }
     }
 
