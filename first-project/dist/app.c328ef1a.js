@@ -166,7 +166,8 @@ function newsDetail() {
   var id = location.hash.substr(7); // # 이후의 내용 저장
 
   var newsContent = getData('GET', CONTENT_URL.replace('@id', id), false);
-  container.innerHTML = "\n        <h1>".concat(newsContent.title, "</h1>\n\n        <div>\n            <a href=\"#/page/").concat(store.currentPage, "\">\uBAA9\uB85D\uC73C\uB85C</a>\n        </div>\n    ");
+  var template = "\n    <div class=\"bg-gray-600 min-h-screen pb-8\">\n        <div class=\"bg-white text-xl\">\n            <div class=\"mx-auto px-4\">\n                <div class=\"flex justify-between tiems-center py-6\">\n                    <div class=\"flex justify-start\">\n                        <h1 class=\"font-extrabold\">Hacker News</h1>\n                    </div>\n                    <div class=\"items-center justify-end\">\n                        <a href=\"#/page/".concat(store.currentPage, "\" class=\"text-gray-500\">\n                            <i class=\"fa fa-times\"></i>\n                        </a>\n                    </div>\n                </div>\n            </div>\n        </div>\n\n        <div class=\"h-full border rounded-xl bg-white m-6 p-4\">\n            <h2>").concat(newsContent.title, "</h2>\n            <div class=\"text-gray-400 h-20\">\n                ").concat(newsContent.content, "\n            </div>\n\n            {{__comments__}}\n        </div>\n    </div>\n    ");
+  container.innerHTML = template;
 }
 
 function router() {
