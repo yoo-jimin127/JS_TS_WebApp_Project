@@ -87,3 +87,25 @@ for (let i = 0; i < 10; i++) {
 
 ### 템플릿 렌더링
 - 동일한 형태에서 세부적인 차이를 가지는 템플릿을 찍어내는 렌더링 방식
+```js
+    let template = `
+        <div>
+        <h1>Hacker News</h1>
+            <ul>
+                {{__news_feed__}}
+            </ul>
+            <div>
+                <a href="#/page/{{__prev_page__}}">이전 페이지</a>
+                <a href="#/page/{{__next_page__}}">다음 페이지</a>
+            </div>
+        </div>
+    `;
+
+    template = template.replace('{{__news_feed__}}', newsList.join('')); // template replace - news list content
+    template = template.replace('{{__prev_page__}}', store.currentPage > 1 ? store.currentPage - 1 : 1); // prev page 
+    template = template.replace('{{__next_page__}}', store.currentPage + 1); // next page
+    
+    container.innerHTML = template; 
+```
+- DOM API 사용하는 것보다 명확한 구조의 확인 가능
+- 코드의 분리를 통해 복잡도 감소

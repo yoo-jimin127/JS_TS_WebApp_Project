@@ -148,8 +148,7 @@ function getNewsFeed() {
 
   for (var i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
     newsList.push("\n        <li>\n            <a href=\"#/show/".concat(newsFeed[i].id, "\">\n                ").concat(newsFeed[i].title, " (").concat(newsFeed[i].comments_count, ")\n            </a>\n        </li>\n        "));
-  } // 배열의 내용을 하나의 문자열로 합쳐주는 함수 join() 사용, 기본 구분자 제거
-
+  }
 
   template = template.replace('{{__news_feed__}}', newsList.join('')); // template replace - news list content
 

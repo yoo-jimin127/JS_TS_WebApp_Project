@@ -43,7 +43,6 @@ function getNewsFeed() {
         `);
     }
 
-    // 배열의 내용을 하나의 문자열로 합쳐주는 함수 join() 사용, 기본 구분자 제거
     template = template.replace('{{__news_feed__}}', newsList.join('')); // template replace - news list content
     template = template.replace('{{__prev_page__}}', store.currentPage > 1 ? store.currentPage - 1 : 1); // prev page 
     template = template.replace('{{__next_page__}}', store.currentPage + 1); // next page
