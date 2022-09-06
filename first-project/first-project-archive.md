@@ -143,4 +143,14 @@ for (let i = 0; i < 10; i++) {
         return commentString.join('');
     }
 ```
- - 함수 인자 접근을 통한 차등 스타일링 적용
+- 함수 인자 접근을 통한 차등 스타일링 적용
+
+### 상태를 통한 방문 페이지 표시
+- 접근 1 : 글 별 id를 통해 방문한 데이터 구조 생성 후 저장하는 방법
+- 접근 2 : 속성 추가를 통한 뉴스 피드 수정 (의존성 down, 효율적)
+```js
+    // 최초 접근의 경우
+    if (newsFeed.length === 0) {
+        newsFeed = store.feeds = getData('GET', URL_ADDR, false);
+    }
+```

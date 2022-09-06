@@ -4,21 +4,33 @@ const content = document.createElement('div');
 const URL_ADDR = 'https://api.hnpwa.com/v0/news/1.json';
 const CONTENT_URL = 'https://api.hnpwa.com/v0/item/@id.json'; // 해당 콘텐츠의 url
 
-// 공유 자원 관리
+/** 공유 자원 관리 */
 const store = {
     currentPage : 1,
+    feeds: [],
 };
 
-function getData(method, url, async) {
+/** ajax 데이터 요청 함수 */
+function getData(method='GET', url, async=false) {
     ajax.open(method, url, async); // 동기 or 비동기 방식으로 서버 요청 값 처리
     ajax.send(); // 데이터를 가져오는 작업
 
     return JSON.parse(ajax.response);
 }
 
+/** 방문 페이지 상태 관리 함수 */
+function makeFeeds(feeds) {
+    for (let i = 0; i < feeds.length; i++) {
+        feeds[i].read = false;
+    }
+    return feeds;
+}
+
+/** 뉴스 목록 호출 함수 */
 function getNewsFeed() {
-    const newsFeed = getData('GET', URL_ADDR, false); // json 데이터 객체 변환 후 리턴
+    let newsFeed = store.feeds; // json 데이터 객체 변환 후 리턴
     const newsList = []; // empty array
+
     let template = `
         <div class="bg-gray-600 min-h-screen">
             <div class="bg-white text-xl">
@@ -38,10 +50,15 @@ function getNewsFeed() {
         </div>
     `;
     
+    // 최초 접근의 경우
+    if (newsFeed.length === 0) {
+        newsFeed = store.feeds = makeFeeds(getData('GET', URL_ADDR, false));
+    }
+
     for (let i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
         newsList.push(
         `
-        <div class="p-6 bg-white mt-6 rounded-lg shadow-md transition-colors duration-500 hover:bg-green-100">
+        <div class="p-6 ${newsFeed[i].read ? 'bg-gray-400' : 'bg-white'} mt-6 rounded-lg shadow-md transition-colors duration-500 hover:bg-green-100">
             <div class="flex">
                 <div class="flex-auto">
                     <a href="#/show/${newsFeed[i].id}">${newsFeed[i].title}</a>
@@ -70,6 +87,7 @@ function getNewsFeed() {
     container.innerHTML = template; 
 }
 
+/** 기사별 세부 페이지 함수 */
 function newsDetail() {
     console.log('hash changed')
     console.log(location.hash); // location 객체의 hash 값 확인 #3029303929 와 같은 방식으로 값 반환
@@ -103,7 +121,15 @@ function newsDetail() {
     </div>
     `;
 
-    /** comment function */
+    // 피드 방문 처리
+    for (let i = 0; i < store.feeds.length; i++) {
+        if (store.feeds[i].id === Number(id)) {
+            store.feeds[i].read = true;
+            break;
+        }
+    }
+
+    /** 댓글 및 대댓글 생성 함수 */
     function makeComment(comments, called = 0) {
         const commentString = []; //comment array
 
