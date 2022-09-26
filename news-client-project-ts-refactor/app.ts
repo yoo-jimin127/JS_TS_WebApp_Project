@@ -1,12 +1,29 @@
-const container = document.getElementById('root'); // find root tag
-const ajax = new XMLHttpRequest(); // ajax 출력 결과 반환
+// store type alias
+type Store = {
+    currentPage: number;
+    feeds: NewsFeed[];
+}
+
+type NewsFeed = {
+    id: number;
+    comments_count: number;
+    url: string;
+    user: string;
+    time_ago: string;
+    points: number;
+    title : string;
+    read?: boolean;
+}
+
+const container: HTMLElement | null = document.getElementById('root'); // find root tag
+const ajax: XMLHttpRequest = new XMLHttpRequest(); // ajax 출력 결과 반환
 const content = document.createElement('div');
 const URL_ADDR = 'https://api.hnpwa.com/v0/news/1.json';
 const CONTENT_URL = 'https://api.hnpwa.com/v0/item/@id.json'; // 해당 콘텐츠의 url
 
 /** 공유 자원 관리 */
-const store = {
-    currentPage : 1,
+const store: Store  = {
+    currentPage: 1,
     feeds: [],
 };
 
@@ -28,7 +45,7 @@ function makeFeeds(feeds) {
 
 /** 뉴스 목록 호출 함수 */
 function getNewsFeed() {
-    let newsFeed = store.feeds; // json 데이터 객체 변환 후 리턴
+    let newsFeed: NewsFeed[] = store.feeds; // json 데이터 객체 변환 후 리턴
     const newsList = []; // empty array
 
     let template = `
@@ -84,7 +101,11 @@ function getNewsFeed() {
     template = template.replace('{{__prev_page__}}', store.currentPage > 1 ? store.currentPage - 1 : 1); // prev page 
     template = template.replace('{{__next_page__}}', store.currentPage + 1); // next page
     
-    container.innerHTML = template; 
+    if (container != null) {
+        container.innerHTML = template;
+    } else {
+        console.log("최상위 컨테이너가 없음");
+    }
 }
 
 /** 기사별 세부 페이지 함수 */
@@ -152,8 +173,10 @@ function newsDetail() {
 
         return commentString.join('');
     }
-
-    container.innerHTML = template.replace('{{__comments__}}', makeComment(newsContent.comments));
+    
+    if (container) {
+        container.innerHTML = template.replace('{{__comments__}}', makeComment(newsContent.comments));
+    }
 }
 
 function router() {

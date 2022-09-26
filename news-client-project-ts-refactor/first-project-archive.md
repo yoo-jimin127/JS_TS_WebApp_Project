@@ -154,3 +154,7 @@ for (let i = 0; i < 10; i++) {
         newsFeed = store.feeds = getData('GET', URL_ADDR, false);
     }
 ```
+
+### Typescript migration
+- `primitive type`
+- `object type`
