@@ -156,5 +156,18 @@ for (let i = 0; i < 10; i++) {
 ```
 
 ### Typescript migration
-- `primitive type`
-- `object type`
+- `primitive type` & `object type`
+
+- `type alias` : 타입 별칭을 통한 타입 지정
+- `interface` : 인터페이스를 통한 타입 지정
+
+- **type guard**
+```js
+function updateView(html) {
+    if (container != null) {
+        container.innerHTML = html;
+    } else {
+        console.log('최상위 컨테이너가 없어 UI를 진행하지 못합니다.');
+    }
+}
+```
