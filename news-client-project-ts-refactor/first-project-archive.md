@@ -171,3 +171,6 @@ function updateView(html) {
     }
 }
 ```
+
+### 함수 규격 작성
+- 
