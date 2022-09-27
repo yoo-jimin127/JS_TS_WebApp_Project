@@ -4,32 +4,26 @@ type Store = {
     feeds: NewsFeed[];
 }
 
-type NewsFeed = {
-    id: number;
-    comments_count: number;
-    url: string;
-    user: string;
-    time_ago: string;
-    points: number;
-    title : string;
-    read?: boolean;
-}
-
-type NewsDetail = {
+type News = {
     id: number;
     time_ago: string;
     title: string;
     url: string;
     user: string;
     content: string;
+}
+
+type NewsFeed = {
+    comments_count: number;
+    points: number;
+    read?: boolean;
+}
+
+type NewsDetail = {
     comments: [];
 }
 
 type NewsComment = {
-    id: number;
-    user: string;
-    time_ago: string;
-    content: string;
     comments: [];
     level: number;
 }
@@ -47,7 +41,7 @@ const store: Store  = {
 };
 
 /** ajax 데이터 요청 함수 */
-function getData(method: string='GET', url: string, async: boolean=false) {
+function getData(method: string='GET', url: string, async: boolean=false): NewsFeed[] | NewsDetail {
     ajax.open(method, url, async); // 동기 or 비동기 방식으로 서버 요청 값 처리
     ajax.send(); // 데이터를 가져오는 작업
 

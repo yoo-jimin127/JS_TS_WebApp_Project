@@ -173,4 +173,48 @@ function updateView(html) {
 ```
 
 ### 함수 규격 작성
-- 
+- type alias 사용을 통한 중복 제거
+    - type alias의 intersection 기능 사용
+```ts
+type NewsFeed = {
+    id: number;
+    comments_count: number;
+    url: string;
+    user: string;
+    time_ago: string;
+    points: number;
+    title : string;
+    read?: boolean;
+}
+
+type NewsDetail = {
+    id: number;
+    time_ago: string;
+    title: string;
+    url: string;
+    user: string;
+    content: string;
+    comments: [];
+}
+```
+- 위 코드를 아래 News 타입과의 인터섹션을 통해 간소화
+```ts
+type News = {
+    id: number;
+    time_ago: string;
+    title: string;
+    url: string;
+    user: string;
+    content: string;
+}
+
+type NewsFeed = {
+    comments_count: number;
+    points: number;
+    read?: boolean;
+}
+
+type NewsDetail = {
+    comments: [];
+}
+```
