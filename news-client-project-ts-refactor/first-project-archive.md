@@ -173,7 +173,7 @@ function updateView(html) {
 ```
 
 ### 함수 규격 작성
-- type alias 사용을 통한 중복 제거
+- type alias 사용을 통한 중복 제거 
     - type alias의 intersection 기능 사용
 ```ts
 type NewsFeed = {
