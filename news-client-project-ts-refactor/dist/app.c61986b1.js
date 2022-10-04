@@ -118,6 +118,34 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 
   return newRequire;
 })({"app.ts":[function(require,module,exports) {
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
 var container = document.getElementById('root'); // find root tag
 
 var ajax = new XMLHttpRequest(); // ajax 출력 결과 반환
@@ -132,23 +160,57 @@ var store = {
   currentPage: 1,
   feeds: []
 };
-/** ajax 데이터 요청 함수 */
 
-function getData(method, url, async) {
-  if (method === void 0) {
-    method = 'GET';
+var Api =
+/** @class */
+function () {
+  function Api(method, url, async) {
+    this.method = method;
+    this.url = url;
+    this.async = async;
+    this.ajax = new XMLHttpRequest();
   }
 
-  if (async === void 0) {
-    async = false;
+  Api.prototype.getRequest = function () {
+    this.ajax.open(this.method, this.url, this.async);
+    ajax.send();
+    return JSON.parse(this.ajax.response);
+  };
+
+  return Api;
+}();
+
+var NewsFeedApi =
+/** @class */
+function (_super) {
+  __extends(NewsFeedApi, _super);
+
+  function NewsFeedApi() {
+    return _super !== null && _super.apply(this, arguments) || this;
   }
 
-  ajax.open(method, url, async); // 동기 or 비동기 방식으로 서버 요청 값 처리
+  NewsFeedApi.prototype.getData = function () {
+    return this.getRequest();
+  };
 
-  ajax.send(); // 데이터를 가져오는 작업
+  return NewsFeedApi;
+}(Api);
 
-  return JSON.parse(ajax.response);
-}
+var NewsDetailApi =
+/** @class */
+function (_super) {
+  __extends(NewsDetailApi, _super);
+
+  function NewsDetailApi() {
+    return _super !== null && _super.apply(this, arguments) || this;
+  }
+
+  NewsDetailApi.prototype.getData = function () {
+    return this.getRequest();
+  };
+
+  return NewsDetailApi;
+}(Api);
 /** 방문 페이지 상태 관리 함수 */
 
 
@@ -176,11 +238,13 @@ function getNewsFeed() {
   var newsFeed = store.feeds; // json 데이터 객체 변환 후 리턴
 
   var newsList = []; // empty array
+  // NewsFeedApi class instance
 
+  var api = new NewsFeedApi('GET', URL_ADDR, false);
   var template = "\n        <div class=\"bg-gray-600 min-h-screen\">\n            <div class=\"bg-white text-xl\">\n                <div class=\"mx-auto px-4\">\n                    <div class=\"flex justify-between items-center py-6\">\n                        <div class=\"flex justify-start\">\n                            <h1 class=\"font-extrabold\">Hacker News</h1>\n                        </div>\n                        <div class=\"item-center justify-end\">\n                            <a href=\"#/page/{{__prev_page__}}\" class=\"text-gray-500\">Previous</a>\n                            <a href=\"#/page/{{__next_page__}}\" class=\"text-gray-500 ml-4\">Next</a>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"p-4 text-2xl text-gray-700\">{{__news_feed__}}</div>\n        </div>\n    "; // 최초 접근의 경우
 
   if (newsFeed.length === 0) {
-    newsFeed = store.feeds = makeFeeds(getData('GET', URL_ADDR, false));
+    newsFeed = store.feeds = makeFeeds(api.getData());
   }
 
   for (var i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
@@ -204,7 +268,9 @@ function getNewsDetail() {
 
   var id = location.hash.substr(7); // # 이후의 내용 저장
 
-  var newsContent = getData('GET', CONTENT_URL.replace('@id', id), false);
+  var api = new NewsDetailApi('GET', CONTENT_URL.replace('@id', id), false); // class instance 생성
+
+  var newsContent = api.getData();
   var template = "\n    <div class=\"bg-gray-600 min-h-screen pb-8\">\n        <div class=\"bg-white text-xl\">\n            <div class=\"mx-auto px-4\">\n                <div class=\"flex justify-between tiems-center py-6\">\n                    <div class=\"flex justify-start\">\n                        <h1 class=\"font-extrabold\">Hacker News</h1>\n                    </div>\n                    <div class=\"items-center justify-end\">\n                        <a href=\"#/page/".concat(store.currentPage, "\" class=\"text-gray-500\">\n                            <i class=\"fa fa-times\"></i>\n                        </a>\n                    </div>\n                </div>\n            </div>\n        </div>\n\n        <div class=\"h-full border rounded-xl bg-white m-6 p-4\">\n            <h2>").concat(newsContent.title, "</h2>\n            <div class=\"text-gray-400 h-20\">\n                ").concat(newsContent.content, "\n            </div>\n\n            {{__comments__}}\n        </div>\n    </div>\n    "); // 피드 방문 처리
 
   for (var i = 0; i < store.feeds.length; i++) {
@@ -279,7 +345,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55235" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56632" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

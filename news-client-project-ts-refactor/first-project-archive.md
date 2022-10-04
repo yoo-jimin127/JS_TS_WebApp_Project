@@ -298,5 +298,44 @@ interface Store {
         }
         ```
 
+        ```ts
+        class Api {
+            method: string;
+            url: string;
+            async: boolean;
+            ajax: XMLHttpRequest;
+
+            constructor(method: string, url: string, async: boolean) {
+                this.method = method;
+                this.url = url;
+                this.async = async;
+
+                this.ajax = new XMLHttpRequest();
+            }
+
+            getRequest<AjaxResponse>(): AjaxResponse {
+                this.ajax.open(this.method, this.url, this.async);
+                ajax.send();
+            
+                return JSON.parse(ajax.response);
+            }
+        }
+
+        class NewsFeedApi extends Api {
+            getData(): NewsFeed[] {
+                return this.getRequest<NewsFeed[]>();
+            }
+        }
+
+        class NewsDetailApi extends Api {
+            getData(): NewsDetail {
+                return this.getRequest<NewsDetail>();
+            }
+        }
+        ```
+
+        - class 사용 시 인스턴스 생성해주어야 함
+        - `protected` : class에서 사용할 용도로 만든 속성과 메소드 등을 외부로 노출시키지 않는 지시어
+
     2. mixin 사용
 

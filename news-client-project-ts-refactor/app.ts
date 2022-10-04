@@ -40,39 +40,37 @@ const store: Store  = {
 };
 
 class Api {
-    url: String;
+    method: string;
+    url: string;
+    async: boolean;
     ajax: XMLHttpRequest;
 
-    constructor(url: string) {
+    constructor(method: string, url: string, async: boolean) {
+        this.method = method;
         this.url = url;
+        this.async = async;
+
         this.ajax = new XMLHttpRequest();
+    }
+
+    protected getRequest<AjaxResponse>(): AjaxResponse {
+        this.ajax.open(this.method, this.url, this.async);
+        ajax.send();
+    
+        return JSON.parse(this.ajax.response);
     }
 }
 
 class NewsFeedApi extends Api {
     getData(): NewsFeed[] {
-        ajax.open(method, url, async);
-        ajax.send();
-    
-        return JSON.parse(ajax.response);
+        return this.getRequest<NewsFeed[]>();
     }
 }
 
 class NewsDetailApi extends Api {
     getData(): NewsDetail {
-        ajax.open(method, url, async);
-        ajax.send();
-
-        return JSON.parse(ajax.response);
+        return this.getRequest<NewsDetail>();
     }
-}
-
-/** ajax 데이터 요청 함수 */
-function getData<AjaxResponse>(method: string='GET', url: string, async: boolean=false): AjaxResponse {
-    ajax.open(method, url, async); // 동기 or 비동기 방식으로 서버 요청 값 처리
-    ajax.send(); // 데이터를 가져오는 작업
-
-    return JSON.parse(ajax.response);
 }
 
 /** 방문 페이지 상태 관리 함수 */
@@ -96,6 +94,8 @@ function updateView(html: string): void {
 function getNewsFeed(): void {
     let newsFeed: NewsFeed[] = store.feeds; // json 데이터 객체 변환 후 리턴
     const newsList: string[] = []; // empty array
+    // NewsFeedApi class instance
+    const api = new NewsFeedApi('GET', URL_ADDR, false);
 
     let template = `
         <div class="bg-gray-600 min-h-screen">
@@ -118,7 +118,7 @@ function getNewsFeed(): void {
     
     // 최초 접근의 경우
     if (newsFeed.length === 0) {
-        newsFeed = store.feeds = makeFeeds(getData<NewsFeed[]>('GET', URL_ADDR, false));
+        newsFeed = store.feeds = makeFeeds(api.getData());
     }
 
     for (let i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
@@ -157,8 +157,11 @@ function getNewsFeed(): void {
 function getNewsDetail(): void {
     console.log('hash changed')
     console.log(location.hash); // location 객체의 hash 값 확인 #3029303929 와 같은 방식으로 값 반환
+
     const id = location.hash.substr(7); // # 이후의 내용 저장
-    const newsContent = getData<NewsDetail>('GET', CONTENT_URL.replace('@id', id), false);
+    const api = new NewsDetailApi('GET', CONTENT_URL.replace('@id', id), false); // class instance 생성
+    const newsContent = api.getData();
+    
     let template = `
     <div class="bg-gray-600 min-h-screen pb-8">
         <div class="bg-white text-xl">
