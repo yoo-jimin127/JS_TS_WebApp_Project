@@ -75,6 +75,9 @@ class NewsDetailApi {
 }
 
 // apply mixin
+interface NewsFeedApi extends Api{};
+interface NewsDetailApi extends Api{};
+
 applyApiMixins(NewsFeedApi, [Api]);
 applyApiMixins(NewsDetailApi, [Api]);
 
