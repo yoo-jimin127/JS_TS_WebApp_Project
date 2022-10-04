@@ -1,31 +1,30 @@
-// ts_store type alias
-type Store = {
+interface Store {
     currentPage: number;
     feeds: NewsFeed[];
 }
 
-type News = {
-    id: number;
-    time_ago: string;
-    title: string;
-    url: string;
-    user: string;
-    ts_content: string;
+interface News {
+    readonly id: number;
+    readonly time_ago: string;
+    readonly title: string;
+    readonly url: string;
+    readonly user: string;
+    readonly content: string;
 }
 
-type NewsFeed = {
-    comments_count: number;
-    points: number;
+interface NewsFeed extends News {
+    readonly comments_count: number;
+    readonly points: number;
     read?: boolean;
 }
 
-type NewsDetail = {
-    comments: [];
+interface NewsDetail extends News {
+    readonly comments: [];
 }
 
-type NewsComment = {
-    comments: [];
-    level: number;
+interface NewsComment extends News {
+    readonly comments: [];
+    readonly level: number;
 }
 
 const ts_container: HTMLElement | null = document.getElementById('root'); // find root tag
@@ -152,7 +151,7 @@ function tsNewsDetail(): void {
         <div class="h-full border rounded-xl bg-white m-6 p-4">
             <h2>${newsContent.title}</h2>
             <div class="text-gray-400 h-20">
-                ${newsContent.ts_content}
+                ${newsContent.content}
             </div>
 
             {{__comments__}}
@@ -184,7 +183,7 @@ function makeComment(comments: NewsComment[]): string {
                     <i class="fa fa-sort-up mr-2"></i>
                     <strong>${comment.user}</strong> ${comment.time_ago}
                 </div>
-                <p class="text-gray-700">${comment.ts_content}</p>
+                <p class="text-gray-700">${comment.content}</p>
             </div>
         `);
         

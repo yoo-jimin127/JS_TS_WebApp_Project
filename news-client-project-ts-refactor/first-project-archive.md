@@ -240,3 +240,44 @@ function getData<AjaxResponse>(method: string='GET', url: string, async: boolean
     return JSON.parse(ajax.response);
 }
 ```
+
+### type alias vs interface
+- **`type alias`**
+```ts
+type Store = {
+    currentPage: number;
+    feeds: NewsFeed[];
+}
+```
+- `=` 사용 (객체 유형을 대입하듯)
+
+- **`interface`**
+```ts
+interface Store {
+    currentPage: number;
+    feeds: NewsFeed[];
+}
+```
+- `=` 사용 X
+- 어떤 유형의 설명을 보다 명확하고 명시적으로 할 수 있음 (& 대신 extends 를 사용해 보다 명확하게 이해 (글로써 표현))
+    - 가독성 up
+- 확장되는 형식의 표현 : interface 선호
+
+- type alias와 interface의 가장 큰 차이점
+    - intersection을 사용하는 부분 (타입의 결합 및 조합의 방식에서의 차이)
+        - type alias : intersection 지원 O
+        ```ts
+        type NewsDetail News & = {
+            comments: NewsContent[];
+        }
+        ```
+
+        - interface : `extends` 사용해 intersection 지원
+        ```ts
+        interface NewsDetail extends News {
+            comments: NewsContent[];
+        }
+        ```
+
+- `readonly` 속성
+    - 수정되어서 안되는 정보를 처리하기 위해 `readonly` 지시어를 사용해 코드에서 해당 정보를 수정할 수 없도록 조작
