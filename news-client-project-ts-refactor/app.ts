@@ -1,4 +1,4 @@
-// store type alias
+// ts_store type alias
 type Store = {
     currentPage: number;
     feeds: NewsFeed[];
@@ -10,7 +10,7 @@ type News = {
     title: string;
     url: string;
     user: string;
-    content: string;
+    ts_content: string;
 }
 
 type NewsFeed = {
@@ -28,28 +28,28 @@ type NewsComment = {
     level: number;
 }
 
-const container: HTMLElement | null = document.getElementById('root'); // find root tag
-const ajax: XMLHttpRequest = new XMLHttpRequest(); // ajax 출력 결과 반환
-const content = document.createElement('div');
-const URL_ADDR = 'https://api.hnpwa.com/v0/news/1.json';
-const CONTENT_URL = 'https://api.hnpwa.com/v0/item/@id.json'; // 해당 콘텐츠의 url
+const ts_container: HTMLElement | null = document.getElementById('root'); // find root tag
+const ts_ajax: XMLHttpRequest = new XMLHttpRequest(); // ts_ajax 출력 결과 반환
+const ts_content = document.createElement('div');
+const TS_URL_ADDR = 'https://api.hnpwa.com/v0/news/1.json';
+const TS_CONTENT_URL = 'https://api.hnpwa.com/v0/item/@id.json'; // 해당 콘텐츠의 url
 
 /** 공유 자원 관리 */
-const store: Store  = {
+const ts_store: Store  = {
     currentPage: 1,
     feeds: [],
 };
 
-/** ajax 데이터 요청 함수 */
-function getData<AjaxResponse>(method: string='GET', url: string, async: boolean=false): AjaxResponse {
-    ajax.open(method, url, async); // 동기 or 비동기 방식으로 서버 요청 값 처리
-    ajax.send(); // 데이터를 가져오는 작업
+/** ts_ajax 데이터 요청 함수 */
+function tsGetData<AjaxResponse>(method: string='GET', url: string, async: boolean=false): AjaxResponse {
+    ts_ajax.open(method, url, async); // 동기 or 비동기 방식으로 서버 요청 값 처리
+    ts_ajax.send(); // 데이터를 가져오는 작업
 
-    return JSON.parse(ajax.response);
+    return JSON.parse(ts_ajax.response);
 }
 
 /** 방문 페이지 상태 관리 함수 */
-function makeFeeds(feeds: NewsFeed[]): NewsFeed[] {
+function tsMakeFeeds(feeds: NewsFeed[]): NewsFeed[] {
     for (let i = 0; i < feeds.length; i++) {
         feeds[i].read = false;
     }
@@ -57,18 +57,18 @@ function makeFeeds(feeds: NewsFeed[]): NewsFeed[] {
 }
 
 /** view 업데이트 함수 */
-function updateView(html: string): void {
-    if (container != null) {
-        container.innerHTML = html;
+function tsUpdateView(html: string): void {
+    if (ts_container != null) {
+        ts_container.innerHTML = html;
     } else {
         console.log('최상위 컨테이너가 없어 UI를 진행하지 못합니다.');
     }
 }
 
 /** 뉴스 목록 호출 함수 */
-function getNewsFeed(): void {
-    let newsFeed: NewsFeed[] = store.feeds; // json 데이터 객체 변환 후 리턴
-    const newsList = []; // empty array
+function tsGetNewsFeed(): void {
+    let newsFeed: NewsFeed[] = ts_store.feeds; // json 데이터 객체 변환 후 리턴
+    const newsList: string[] = []; // empty array
 
     let template = `
         <div class="bg-gray-600 min-h-screen">
@@ -91,10 +91,10 @@ function getNewsFeed(): void {
     
     // 최초 접근의 경우
     if (newsFeed.length === 0) {
-        newsFeed = store.feeds = makeFeeds(getData<NewsFeed[]>('GET', URL_ADDR, false));
+        newsFeed = ts_store.feeds = tsMakeFeeds(tsGetData<NewsFeed[]>('GET', TS_URL_ADDR, false));
     }
 
-    for (let i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
+    for (let i = (ts_store.currentPage - 1) * 10; i < ts_store.currentPage * 10; i++) {
         newsList.push(
         `
         <div class="p-6 ${newsFeed[i].read ? 'bg-gray-400' : 'bg-white'} mt-6 rounded-lg shadow-md transition-colors duration-500 hover:bg-green-100">
@@ -119,19 +119,19 @@ function getNewsFeed(): void {
         `);
     }
 
-    template = template.replace('{{__news_feed__}}', newsList.join('')); // template replace - news list content
-    template = template.replace('{{__prev_page__}}', String(store.currentPage > 1 ? store.currentPage - 1 : 1)); // prev page 
-    template = template.replace('{{__next_page__}}', String(store.currentPage + 1)); // next page
+    template = template.replace('{{__news_feed__}}', newsList.join('')); // template replace - news list ts_content
+    template = template.replace('{{__prev_page__}}', String(ts_store.currentPage > 1 ? ts_store.currentPage - 1 : 1)); // prev page 
+    template = template.replace('{{__next_page__}}', String(ts_store.currentPage + 1)); // next page
     
-    updateView(template);
+    tsUpdateView(template);
 }
 
 /** 기사별 세부 페이지 함수 */
-function newsDetail(): void {
+function tsNewsDetail(): void {
     console.log('hash changed')
     console.log(location.hash); // location 객체의 hash 값 확인 #3029303929 와 같은 방식으로 값 반환
     const id = location.hash.substr(7); // # 이후의 내용 저장
-    const newsContent = getData<NewsDetail>('GET', CONTENT_URL.replace('@id', id), false);
+    const newsContent = tsGetData<NewsDetail>('GET', TS_CONTENT_URL.replace('@id', id), false);
     let template = `
     <div class="bg-gray-600 min-h-screen pb-8">
         <div class="bg-white text-xl">
@@ -141,7 +141,7 @@ function newsDetail(): void {
                         <h1 class="font-extrabold">Hacker News</h1>
                     </div>
                     <div class="items-center justify-end">
-                        <a href="#/page/${store.currentPage}" class="text-gray-500">
+                        <a href="#/page/${ts_store.currentPage}" class="text-gray-500">
                             <i class="fa fa-times"></i>
                         </a>
                     </div>
@@ -152,7 +152,7 @@ function newsDetail(): void {
         <div class="h-full border rounded-xl bg-white m-6 p-4">
             <h2>${newsContent.title}</h2>
             <div class="text-gray-400 h-20">
-                ${newsContent.content}
+                ${newsContent.ts_content}
             </div>
 
             {{__comments__}}
@@ -161,19 +161,19 @@ function newsDetail(): void {
     `;
 
     // 피드 방문 처리
-    for (let i = 0; i < store.feeds.length; i++) {
-        if (store.feeds[i].id === Number(id)) {
-            store.feeds[i].read = true;
+    for (let i = 0; i < ts_store.feeds.length; i++) {
+        if (ts_store.feeds[i].id === Number(id)) {
+            ts_store.feeds[i].read = true;
             break;
         }
     }
     
-    updateView(template.replace('{{__comments__}}', makeComment(newsContent.comments)));
+    tsUpdateView(template.replace('{{__comments__}}', makeComment(newsContent.comments)));
 }
 
 /** 댓글 및 대댓글 생성 함수 */
 function makeComment(comments: NewsComment[]): string {
-    const commentString = []; //comment array
+    const commentString: string[] = []; //comment array
 
     for (let i = 0; i < comments.length; i++) {
         const comment: NewsComment = comments[i];
@@ -184,7 +184,7 @@ function makeComment(comments: NewsComment[]): string {
                     <i class="fa fa-sort-up mr-2"></i>
                     <strong>${comment.user}</strong> ${comment.time_ago}
                 </div>
-                <p class="text-gray-700">${comment.content}</p>
+                <p class="text-gray-700">${comment.ts_content}</p>
             </div>
         `);
         
@@ -197,21 +197,21 @@ function makeComment(comments: NewsComment[]): string {
     return commentString.join('');
 }
 
-function router(): void {
+function tsRouter(): void {
     const routePath = location.hash;
 
     if(routePath === '') {
         // location.hash === # 일 경우 빈 값 반환
-        getNewsFeed();
+        tsGetNewsFeed();
     }
     else if (routePath.indexOf('#/page/') >= 0) {
-        store.currentPage = Number(routePath.substr(7));
-        getNewsFeed();
+        ts_store.currentPage = Number(routePath.substr(7));
+        tsGetNewsFeed();
     }
     else {
-        newsDetail();
+        tsNewsDetail();
     }
 }
 
-window.addEventListener('hashchange', router); // router : hash의 변경마다 보여줌
-router();
+window.addEventListener('hashchange', tsRouter); // tsRouter : hash의 변경마다 보여줌
+tsRouter();
