@@ -218,3 +218,25 @@ type NewsDetail = {
     comments: [];
 }
 ```
+
+### REST Client
+- `generic`을 사용해 데이터의 타입을 일반화하는 문법
+```ts
+/** ajax 데이터 요청 함수 */
+function getData(method: string='GET', url: string, async: boolean=false): NewsFeed[] | NewsDetail {
+    ajax.open(method, url, async); // 동기 or 비동기 방식으로 서버 요청 값 처리
+    ajax.send(); // 데이터를 가져오는 작업
+
+    return JSON.parse(ajax.response);
+}
+```
+- 입력의 케이스가 n개일 때 출력의 케이스 역시 n으로 처리해줄 수 있는 방법
+```ts
+/** ajax 데이터 요청 함수 */
+function getData<AjaxResponse>(method: string='GET', url: string, async: boolean=false): AjaxResponse {
+    ajax.open(method, url, async); // 동기 or 비동기 방식으로 서버 요청 값 처리
+    ajax.send(); // 데이터를 가져오는 작업
+
+    return JSON.parse(ajax.response);
+}
+```

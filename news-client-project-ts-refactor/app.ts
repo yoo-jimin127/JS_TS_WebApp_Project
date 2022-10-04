@@ -41,7 +41,7 @@ const store: Store  = {
 };
 
 /** ajax 데이터 요청 함수 */
-function getData(method: string='GET', url: string, async: boolean=false): NewsFeed[] | NewsDetail {
+function getData<AjaxResponse>(method: string='GET', url: string, async: boolean=false): AjaxResponse {
     ajax.open(method, url, async); // 동기 or 비동기 방식으로 서버 요청 값 처리
     ajax.send(); // 데이터를 가져오는 작업
 
@@ -49,7 +49,7 @@ function getData(method: string='GET', url: string, async: boolean=false): NewsF
 }
 
 /** 방문 페이지 상태 관리 함수 */
-function makeFeeds(feeds) {
+function makeFeeds(feeds: NewsFeed[]): NewsFeed[] {
     for (let i = 0; i < feeds.length; i++) {
         feeds[i].read = false;
     }
@@ -57,7 +57,7 @@ function makeFeeds(feeds) {
 }
 
 /** view 업데이트 함수 */
-function updateView(html) {
+function updateView(html: string): void {
     if (container != null) {
         container.innerHTML = html;
     } else {
@@ -66,7 +66,7 @@ function updateView(html) {
 }
 
 /** 뉴스 목록 호출 함수 */
-function getNewsFeed() {
+function getNewsFeed(): void {
     let newsFeed: NewsFeed[] = store.feeds; // json 데이터 객체 변환 후 리턴
     const newsList = []; // empty array
 
@@ -91,7 +91,7 @@ function getNewsFeed() {
     
     // 최초 접근의 경우
     if (newsFeed.length === 0) {
-        newsFeed = store.feeds = makeFeeds(getData('GET', URL_ADDR, false));
+        newsFeed = store.feeds = makeFeeds(getData<NewsFeed[]>('GET', URL_ADDR, false));
     }
 
     for (let i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
@@ -120,18 +120,18 @@ function getNewsFeed() {
     }
 
     template = template.replace('{{__news_feed__}}', newsList.join('')); // template replace - news list content
-    template = template.replace('{{__prev_page__}}', store.currentPage > 1 ? store.currentPage - 1 : 1); // prev page 
-    template = template.replace('{{__next_page__}}', store.currentPage + 1); // next page
+    template = template.replace('{{__prev_page__}}', String(store.currentPage > 1 ? store.currentPage - 1 : 1)); // prev page 
+    template = template.replace('{{__next_page__}}', String(store.currentPage + 1)); // next page
     
     updateView(template);
 }
 
 /** 기사별 세부 페이지 함수 */
-function newsDetail() {
+function newsDetail(): void {
     console.log('hash changed')
     console.log(location.hash); // location 객체의 hash 값 확인 #3029303929 와 같은 방식으로 값 반환
     const id = location.hash.substr(7); // # 이후의 내용 저장
-    const newsContent = getData('GET', CONTENT_URL.replace('@id', id), false);
+    const newsContent = getData<NewsDetail>('GET', CONTENT_URL.replace('@id', id), false);
     let template = `
     <div class="bg-gray-600 min-h-screen pb-8">
         <div class="bg-white text-xl">
@@ -167,35 +167,37 @@ function newsDetail() {
             break;
         }
     }
-
-    /** 댓글 및 대댓글 생성 함수 */
-    function makeComment(comments, called = 0) {
-        const commentString = []; //comment array
-
-        for (let i = 0; i < comments.length; i++) {
-            commentString.push(`
-                <div style="padding-left: ${called * 40}px;" class="mt-4">
-                    <div class="text-gray-400">
-                        <i class="fa fa-sort-up mr-2"></i>
-                        <strong>${comments[i].user}</strong> ${comments[i].time_ago}
-                    </div>
-                    <p class="text-gray-700">${comments[i].content}</p>
-                </div>
-            `);
-            
-            // 대댓글 처리
-            if (comments[i].comments.length > 0) {
-                commentString.push(makeComment(comments[i].comments, called + 1));
-            }
-        }
-
-        return commentString.join('');
-    }
     
     updateView(template.replace('{{__comments__}}', makeComment(newsContent.comments)));
 }
 
-function router() {
+/** 댓글 및 대댓글 생성 함수 */
+function makeComment(comments: NewsComment[]): string {
+    const commentString = []; //comment array
+
+    for (let i = 0; i < comments.length; i++) {
+        const comment: NewsComment = comments[i];
+
+        commentString.push(`
+            <div style="padding-left: ${comment.level * 40}px;" class="mt-4">
+                <div class="text-gray-400">
+                    <i class="fa fa-sort-up mr-2"></i>
+                    <strong>${comment.user}</strong> ${comment.time_ago}
+                </div>
+                <p class="text-gray-700">${comment.content}</p>
+            </div>
+        `);
+        
+        // 대댓글 처리
+        if (comments[i].comments.length > 0) {
+            commentString.push(makeComment(comment.comments));
+        }
+    }
+
+    return commentString.join('');
+}
+
+function router(): void {
     const routePath = location.hash;
 
     if(routePath === '') {
