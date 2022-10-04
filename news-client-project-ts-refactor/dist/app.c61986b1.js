@@ -118,34 +118,6 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 
   return newRequire;
 })({"app.ts":[function(require,module,exports) {
-var __extends = this && this.__extends || function () {
-  var _extendStatics = function extendStatics(d, b) {
-    _extendStatics = Object.setPrototypeOf || {
-      __proto__: []
-    } instanceof Array && function (d, b) {
-      d.__proto__ = b;
-    } || function (d, b) {
-      for (var p in b) {
-        if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
-      }
-    };
-
-    return _extendStatics(d, b);
-  };
-
-  return function (d, b) {
-    if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-
-    _extendStatics(d, b);
-
-    function __() {
-      this.constructor = d;
-    }
-
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-}();
-
 var container = document.getElementById('root'); // find root tag
 
 var ajax = new XMLHttpRequest(); // ajax 출력 결과 반환
@@ -159,22 +131,30 @@ var CONTENT_URL = 'https://api.hnpwa.com/v0/item/@id.json'; // 해당 콘텐츠�
 var store = {
   currentPage: 1,
   feeds: []
-};
+}; // mixin
+
+function applyApiMixins(targetClass, baseClasses) {
+  baseClasses.forEach(function (baseClass) {
+    Object.getOwnPropertyNames(baseClass.prototype).forEach(function (name) {
+      var descriptor = Object.getOwnPropertyDescriptor(baseClass.prototype, name);
+
+      if (descriptor) {
+        Object.defineProperty(targetClass.prototype, name, descriptor);
+      }
+    });
+  });
+}
 
 var Api =
 /** @class */
 function () {
-  function Api(method, url, async) {
-    this.method = method;
-    this.url = url;
-    this.async = async;
-    this.ajax = new XMLHttpRequest();
-  }
+  function Api() {}
 
-  Api.prototype.getRequest = function () {
-    this.ajax.open(this.method, this.url, this.async);
-    this.ajax.send();
-    return JSON.parse(this.ajax.response);
+  Api.prototype.getRequest = function (method, url, async) {
+    var ajax = new XMLHttpRequest();
+    ajax.open(method, url, async);
+    ajax.send();
+    return JSON.parse(ajax.response);
   };
 
   return Api;
@@ -182,37 +162,32 @@ function () {
 
 var NewsFeedApi =
 /** @class */
-function (_super) {
-  __extends(NewsFeedApi, _super);
-
-  function NewsFeedApi() {
-    return _super !== null && _super.apply(this, arguments) || this;
-  }
+function () {
+  function NewsFeedApi() {}
 
   NewsFeedApi.prototype.getData = function () {
-    return this.getRequest();
+    return this.getRequest('GET', URL_ADDR, false);
   };
 
   return NewsFeedApi;
-}(Api);
+}();
 
 var NewsDetailApi =
 /** @class */
-function (_super) {
-  __extends(NewsDetailApi, _super);
+function () {
+  function NewsDetailApi() {}
 
-  function NewsDetailApi() {
-    return _super !== null && _super.apply(this, arguments) || this;
-  }
-
-  NewsDetailApi.prototype.getData = function () {
-    return this.getRequest();
+  NewsDetailApi.prototype.getData = function (id) {
+    return this.getRequest('GET', CONTENT_URL.replace('@id', id), false);
   };
 
   return NewsDetailApi;
-}(Api);
-/** 방문 페이지 상태 관리 함수 */
+}(); // apply mixin
 
+
+applyApiMixins(NewsFeedApi, [Api]);
+applyApiMixins(NewsDetailApi, [Api]);
+/** 방문 페이지 상태 관리 함수 */
 
 function makeFeeds(feeds) {
   for (var i = 0; i < feeds.length; i++) {
@@ -240,7 +215,7 @@ function getNewsFeed() {
   var newsList = []; // empty array
   // NewsFeedApi class instance
 
-  var api = new NewsFeedApi('GET', URL_ADDR, false);
+  var api = new NewsFeedApi();
   var template = "\n        <div class=\"bg-gray-600 min-h-screen\">\n            <div class=\"bg-white text-xl\">\n                <div class=\"mx-auto px-4\">\n                    <div class=\"flex justify-between items-center py-6\">\n                        <div class=\"flex justify-start\">\n                            <h1 class=\"font-extrabold\">Hacker News</h1>\n                        </div>\n                        <div class=\"item-center justify-end\">\n                            <a href=\"#/page/{{__prev_page__}}\" class=\"text-gray-500\">Previous</a>\n                            <a href=\"#/page/{{__next_page__}}\" class=\"text-gray-500 ml-4\">Next</a>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"p-4 text-2xl text-gray-700\">{{__news_feed__}}</div>\n        </div>\n    "; // 최초 접근의 경우
 
   if (newsFeed.length === 0) {
@@ -268,9 +243,9 @@ function getNewsDetail() {
 
   var id = location.hash.substr(7); // # 이후의 내용 저장
 
-  var api = new NewsDetailApi('GET', CONTENT_URL.replace('@id', id), false); // class instance 생성
+  var api = new NewsDetailApi(); // class instance 생성
 
-  var newsContent = api.getData();
+  var newsContent = api.getData(id);
   var template = "\n    <div class=\"bg-gray-600 min-h-screen pb-8\">\n        <div class=\"bg-white text-xl\">\n            <div class=\"mx-auto px-4\">\n                <div class=\"flex justify-between tiems-center py-6\">\n                    <div class=\"flex justify-start\">\n                        <h1 class=\"font-extrabold\">Hacker News</h1>\n                    </div>\n                    <div class=\"items-center justify-end\">\n                        <a href=\"#/page/".concat(store.currentPage, "\" class=\"text-gray-500\">\n                            <i class=\"fa fa-times\"></i>\n                        </a>\n                    </div>\n                </div>\n            </div>\n        </div>\n\n        <div class=\"h-full border rounded-xl bg-white m-6 p-4\">\n            <h2>").concat(newsContent.title, "</h2>\n            <div class=\"text-gray-400 h-20\">\n                ").concat(newsContent.content, "\n            </div>\n\n            {{__comments__}}\n        </div>\n    </div>\n    "); // 피드 방문 처리
 
   for (var i = 0; i < store.feeds.length; i++) {
@@ -345,7 +320,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57363" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54294" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

@@ -39,39 +39,44 @@ const store: Store  = {
     feeds: [],
 };
 
+// mixin
+function applyApiMixins(targetClass: any, baseClasses: any) {
+    baseClasses.forEach(baseClass => {
+        Object.getOwnPropertyNames(baseClass.prototype).forEach(name => {
+            const descriptor = Object.getOwnPropertyDescriptor(baseClass.prototype, name);
+
+            if (descriptor) {
+                Object.defineProperty(targetClass.prototype, name, descriptor);
+            }
+        });
+    });
+}
+
 class Api {
-    method: string;
-    url: string;
-    async: boolean;
-    ajax: XMLHttpRequest;
-
-    constructor(method: string, url: string, async: boolean) {
-        this.method = method;
-        this.url = url;
-        this.async = async;
-
-        this.ajax = new XMLHttpRequest();
-    }
-
-    protected getRequest<AjaxResponse>(): AjaxResponse {
-        this.ajax.open(this.method, this.url, this.async);
-        this.ajax.send();
+    getRequest<AjaxResponse>(method: string, url: string, async: boolean): AjaxResponse {
+        const ajax = new XMLHttpRequest();
+        ajax.open(method, url, async);
+        ajax.send();
     
-        return JSON.parse(this.ajax.response);
+        return JSON.parse(ajax.response);
     }
 }
 
-class NewsFeedApi extends Api {
+class NewsFeedApi {
     getData(): NewsFeed[] {
-        return this.getRequest<NewsFeed[]>();
+        return this.getRequest<NewsFeed[]>( 'GET', URL_ADDR, false);
     }
 }
 
-class NewsDetailApi extends Api {
-    getData(): NewsDetail {
-        return this.getRequest<NewsDetail>();
+class NewsDetailApi {
+    getData(id: string): NewsDetail {
+        return this.getRequest<NewsDetail>('GET', CONTENT_URL.replace('@id', id), false);
     }
 }
+
+// apply mixin
+applyApiMixins(NewsFeedApi, [Api]);
+applyApiMixins(NewsDetailApi, [Api]);
 
 /** 방문 페이지 상태 관리 함수 */
 function makeFeeds(feeds: NewsFeed[]): NewsFeed[] {
@@ -95,7 +100,7 @@ function getNewsFeed(): void {
     let newsFeed: NewsFeed[] = store.feeds; // json 데이터 객체 변환 후 리턴
     const newsList: string[] = []; // empty array
     // NewsFeedApi class instance
-    const api = new NewsFeedApi('GET', URL_ADDR, false);
+    const api = new NewsFeedApi();
 
     let template = `
         <div class="bg-gray-600 min-h-screen">
@@ -159,8 +164,8 @@ function getNewsDetail(): void {
     console.log(location.hash); // location 객체의 hash 값 확인 #3029303929 와 같은 방식으로 값 반환
 
     const id = location.hash.substr(7); // # 이후의 내용 저장
-    const api = new NewsDetailApi('GET', CONTENT_URL.replace('@id', id), false); // class instance 생성
-    const newsContent = api.getData();
+    const api = new NewsDetailApi(); // class instance 생성
+    const newsContent = api.getData(id);
     
     let template = `
     <div class="bg-gray-600 min-h-screen pb-8">
