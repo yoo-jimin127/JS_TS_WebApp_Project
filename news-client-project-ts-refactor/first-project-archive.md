@@ -285,4 +285,18 @@ interface Store {
 ### 상속과 믹스인
 - 공통 요소를 만들어둔 뒤 공통요소를 확장한 개별요소를 만드는 방식
     1. class 사용
+        - class : 최초의 초기화 과정 필요, `constructor()`로 사용
+        ```ts
+        class Api {
+            url: String;
+        ajax: XMLHttpRequest;
+
+            constructor(url: string) {
+                this.url = url;
+                this.ajax = new XMLHttpRequest();
+            }
+        }
+        ```
+
     2. mixin 사용
+
