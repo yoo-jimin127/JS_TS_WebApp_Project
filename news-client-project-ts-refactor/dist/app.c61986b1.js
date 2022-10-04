@@ -173,7 +173,7 @@ function () {
 
   Api.prototype.getRequest = function () {
     this.ajax.open(this.method, this.url, this.async);
-    ajax.send();
+    this.ajax.send();
     return JSON.parse(this.ajax.response);
   };
 
@@ -345,7 +345,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56632" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57363" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

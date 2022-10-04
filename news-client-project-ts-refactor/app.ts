@@ -55,7 +55,7 @@ class Api {
 
     protected getRequest<AjaxResponse>(): AjaxResponse {
         this.ajax.open(this.method, this.url, this.async);
-        ajax.send();
+        this.ajax.send();
     
         return JSON.parse(this.ajax.response);
     }
