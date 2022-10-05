@@ -30,8 +30,8 @@ interface NewsComment extends News {
 const container: HTMLElement | null = document.getElementById('root'); // find root tag
 const ajax: XMLHttpRequest = new XMLHttpRequest(); // ajax 출력 결과 반환
 const content = document.createElement('div');
-const URL_ADDR = 'https://api.hnpwa.com/v0/news/1.json';
-const CONTENT_URL = 'https://api.hnpwa.com/v0/item/@id.json'; // 해당 콘텐츠의 url
+const URL_ADDR: string = 'https://api.hnpwa.com/v0/news/1.json';
+const CONTENT_URL: string = 'https://api.hnpwa.com/v0/item/@id.json'; // 해당 콘텐츠의 url
 
 /** 공유 자원 관리 */
 const store: Store  = {
