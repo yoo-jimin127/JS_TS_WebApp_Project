@@ -27,9 +27,8 @@ interface NewsComment extends News {
     readonly level: number;
 }
 
-const container: HTMLElement | null = document.getElementById('root'); // find root tag
 const ajax: XMLHttpRequest = new XMLHttpRequest(); // ajax 출력 결과 반환
-const content = document.createElement('div');
+// const content = document.createElement('div');
 const URL_ADDR: string = 'https://api.hnpwa.com/v0/news/1.json';
 const CONTENT_URL: string = 'https://api.hnpwa.com/v0/item/@id.json'; // 해당 콘텐츠의 url
 
@@ -96,13 +95,11 @@ class View {
 }
 
 class NewsFeedView extends View {
-    constructor() {
-    let newsFeed: NewsFeed[] = store.feeds; // json 데이터 객체 변환 후 리턴
-    
-    // NewsFeedApi class instance
-    const api = new NewsFeedApi();
+    api: NewsFeedApi;
+    feeds: NewsFeed[];
 
-    let template = `
+    constructor(containerId: string) {
+        let template = `
         <div class="bg-gray-600 min-h-screen">
             <div class="bg-white text-xl">
                 <div class="mx-auto px-4">
@@ -119,54 +116,61 @@ class NewsFeedView extends View {
             </div>
             <div class="p-4 text-2xl text-gray-700">{{__news_feed__}}</div>
         </div>
-    `;
+        `;
+
+        super(containerId, template);
+
+        this.feeds = store.feeds; // json 데이터 객체 변환 후 리턴
+        this.api = new NewsFeedApi(); // NewsFeedApi class instance
     
-    // 최초 접근의 경우
-    if (newsFeed.length === 0) {
-        newsFeed = store.feeds = makeFeeds(api.getData());
+        // 최초 접근의 경우
+        if (this.feeds.length === 0) {
+            this.feeds = store.feeds = this.api.getData();
+            this.makeFeeds();
+        }
     }
 
-    /** 뉴스 목록 호출 함수 */
-    render(): void {
-        const newsList: string[] = []; // empty array
-        for (let i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
-            newsList.push(
-            `
-            <div class="p-6 ${newsFeed[i].read ? 'bg-gray-400' : 'bg-white'} mt-6 rounded-lg shadow-md transition-colors duration-500 hover:bg-green-100">
-                <div class="flex">
-                    <div class="flex-auto">
-                        <a href="#/show/${newsFeed[i].id}">${newsFeed[i].title}</a>
+        /** 뉴스 목록 호출 함수 */
+        render(): void {
+            const newsList: string[] = []; // empty array
+
+            for (let i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
+                newsList.push(
+                `
+                <div class="p-6 ${newsFeed[i].read ? 'bg-gray-400' : 'bg-white'} mt-6 rounded-lg shadow-md transition-colors duration-500 hover:bg-green-100">
+                    <div class="flex">
+                        <div class="flex-auto">
+                            <a href="#/show/${newsFeed[i].id}">${newsFeed[i].title}</a>
+                        </div>
+                        <div class="text-center text-sm">
+                        <div class="w-10 text-white bg-green-300 rounded-lg px-0 py-2">
+                                ${newsFeed[i].comments_count}
+                            </div>
+                        </div>
                     </div>
-                    <div class="text-center text-sm">
-                    <div class="w-10 text-white bg-green-300 rounded-lg px-0 py-2">
-                            ${newsFeed[i].comments_count}
+                    <div class="flex mt-3">
+                        <div class="grid gird-cols-3 text-sm text-gray-500">
+                            <div><i class="fas fa-user mr-1"></i>${newsFeed[i].user}</div>
+                            <div><i class="fas fa-heart mr-1"></i>${newsFeed[i].points}</div>
+                            <div><i class="far fa-clock mr-1"></i>${newsFeed[i].time_ago}</div>
                         </div>
                     </div>
                 </div>
-                <div class="flex mt-3">
-                    <div class="grid gird-cols-3 text-sm text-gray-500">
-                        <div><i class="fas fa-user mr-1"></i>${newsFeed[i].user}</div>
-                        <div><i class="fas fa-heart mr-1"></i>${newsFeed[i].points}</div>
-                        <div><i class="far fa-clock mr-1"></i>${newsFeed[i].time_ago}</div>
-                    </div>
-                </div>
-            </div>
-            `);
-        }
+                `);
+            }
 
-        template = template.replace('{{__news_feed__}}', newsList.join('')); // template replace - news list content
-        template = template.replace('{{__prev_page__}}', String(store.currentPage > 1 ? store.currentPage - 1 : 1)); // prev page 
-        template = template.replace('{{__next_page__}}', String(store.currentPage + 1)); // next page
-        
-        updateView(template);
+            template = template.replace('{{__news_feed__}}', newsList.join('')); // template replace - news list content
+            template = template.replace('{{__prev_page__}}', String(store.currentPage > 1 ? store.currentPage - 1 : 1)); // prev page 
+            template = template.replace('{{__next_page__}}', String(store.currentPage + 1)); // next page
+
+            updateView(template);
     }
 
     /** 방문 페이지 상태 관리 함수 */
-    makeFeeds(feeds: NewsFeed[]): NewsFeed[] {
-        for (let i = 0; i < feeds.length; i++) {
-            feeds[i].read = false;
+    makeFeeds(): void {
+        for (let i = 0; i < this.feeds.length; i++) {
+            this.feeds[i].read = false;
         }
-        return feeds;
     }
 }
 
