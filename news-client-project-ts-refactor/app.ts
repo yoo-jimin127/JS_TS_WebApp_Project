@@ -79,16 +79,19 @@ class View {
     template: string;
     container: HTMLElement;
 
-    constructor() {
-        
+    constructor(containerId: string, template: string) {
+        const containerElement = document.getElementById(containerId);
+
+        if (!containerElement) {
+            throw '최상위 컨테이너가 없어 UI를 진행하지 못합니다.'
+        }
+
+        this.container = containerElement;
+        this.template = template;
     }
 
     updateView(html: string): void {
-        if (container) {
-            container.innerHTML = html;
-        } else {
-            console.error("최상위 컨테이너가 없어 UI 업데이트를 진행하지 못합니다.")
-        }
+        this.container.innerHTML= html;
     }
 }
 
