@@ -99,6 +99,11 @@ class View {
     addHtml(htmlString: string): void {
         this.htmlList.push(htmlString);
     }
+
+    /** 문자열 병합 값 리턴 함수 */
+    getHtml(): string {
+        return this.htmlList.join('');
+    }
 }
 
 class NewsFeedView extends View {
@@ -139,33 +144,32 @@ class NewsFeedView extends View {
 
     /** 뉴스 목록 호출 함수 */
     render(): void {
-    
         for (let i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
             this.addHtml(
             `
-            <div class="p-6 ${newsFeed[i].read ? 'bg-gray-400' : 'bg-white'} mt-6 rounded-lg shadow-md transition-colors duration-500 hover:bg-green-100">
+            <div class="p-6 ${this.feeds[i].read ? 'bg-gray-400' : 'bg-white'} mt-6 rounded-lg shadow-md transition-colors duration-500 hover:bg-green-100">
                 <div class="flex">
                     <div class="flex-auto">
-                        <a href="#/show/${newsFeed[i].id}">${newsFeed[i].title}</a>
+                        <a href="#/show/${this.feeds[i].id}">${this.feeds[i].title}</a>
                     </div>
                     <div class="text-center text-sm">
                     <div class="w-10 text-white bg-green-300 rounded-lg px-0 py-2">
-                            ${newsFeed[i].comments_count}
+                            ${this.feeds[i].comments_count}
                         </div>
                     </div>
                 </div>
                 <div class="flex mt-3">
                     <div class="grid gird-cols-3 text-sm text-gray-500">
-                        <div><i class="fas fa-user mr-1"></i>${newsFeed[i].user}</div>
-                        <div><i class="fas fa-heart mr-1"></i>${newsFeed[i].points}</div>
-                        <div><i class="far fa-clock mr-1"></i>${newsFeed[i].time_ago}</div>
+                        <div><i class="fas fa-user mr-1"></i>${this.feeds[i].user}</div>
+                        <div><i class="fas fa-heart mr-1"></i>${this.feeds[i].points}</div>
+                        <div><i class="far fa-clock mr-1"></i>${this.feeds[i].time_ago}</div>
                     </div>
                 </div>
             </div>
             `);
         }
 
-        template = template.replace('{{__news_feed__}}', newsList.join('')); // template replace - news list content
+        template = template.replace('{{__news_feed__}}', this.getHtml()); // template replace - news list content
         template = template.replace('{{__prev_page__}}', String(store.currentPage > 1 ? store.currentPage - 1 : 1)); // prev page 
         template = template.replace('{{__next_page__}}', String(store.currentPage + 1)); // next page
         updateView(template);
@@ -180,7 +184,7 @@ class NewsFeedView extends View {
 }
 
 class NewsDetailView extends View {
-    constructor() {    
+    constructor(containerId: string) {    
         let template = `
         <div class="bg-gray-600 min-h-screen pb-8">
             <div class="bg-white text-xl">
@@ -208,6 +212,8 @@ class NewsDetailView extends View {
             </div>
         </div>
         `;
+
+        super(containerId, template);
     }
 
     render(): void {
@@ -226,17 +232,15 @@ class NewsDetailView extends View {
             }
         }
             
-        updateView(template.replace('{{__comments__}}', makeComment(newsContent.comments)));
+        this.updateView(template.replace('{{__comments__}}', this.makeComment(newsContent.comments)));
     }
 
     /** 댓글 및 대댓글 생성 함수 */
     makeComment(comments: NewsComment[]): string {
-        const commentString: string[] = []; //comment array
-
         for (let i = 0; i < comments.length; i++) {
             const comment: NewsComment = comments[i];
 
-            commentString.push(`
+            this.addHtml(`
                 <div style="padding-left: ${comment.level * 40}px;" class="mt-4">
                     <div class="text-gray-400">
                         <i class="fa fa-sort-up mr-2"></i>
@@ -248,11 +252,11 @@ class NewsDetailView extends View {
         
             // 대댓글 처리
             if (comments[i].comments.length > 0) {
-                commentString.push(makeComment(comment.comments));
+                this.addHtml(this.makeComment(comment.comments));
             }
         }
 
-        return commentString.join('');
+        return this.getHtml();
     }
 }
 
