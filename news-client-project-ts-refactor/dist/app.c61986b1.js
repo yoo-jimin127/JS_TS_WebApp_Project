@@ -208,7 +208,8 @@ function () {
   };
 
   return NewsDetailApi;
-}(); // 공통 요소 클래스
+}();
+/** 공통 요소 클래스 */
 
 
 var View =
@@ -223,11 +224,13 @@ function () {
 
     this.container = containerElement;
     this.template = template;
+    this.renderTemplate = template;
     this.htmlList = [];
   }
 
-  View.prototype.updateView = function (html) {
-    this.container.innerHTML = html;
+  View.prototype.updateView = function () {
+    this.container.innerHTML = this.renderTemplate;
+    this.renderTemplate = this.template; // UI 업데이트 작업 후 원본 템플릿으로 복원
   };
   /** html 문자열 추가 함수 */
 
@@ -240,6 +243,12 @@ function () {
 
   View.prototype.getHtml = function () {
     return this.htmlList.join('');
+  };
+  /** template 내용 대체 함수 */
+
+
+  View.prototype.setTemplateData = function (key, value) {
+    this.renderTemplate = this.template.replace("{{__".concat(key, "__}}"), value);
   };
 
   return View;
@@ -284,11 +293,11 @@ function (_super) {
       this.addHtml("\n            <div class=\"p-6 ".concat(read ? 'bg-gray-400' : 'bg-white', " mt-6 rounded-lg shadow-md transition-colors duration-500 hover:bg-green-100\">\n                <div class=\"flex\">\n                    <div class=\"flex-auto\">\n                        <a href=\"#/show/").concat(id, "\">").concat(title, "</a>\n                    </div>\n                    <div class=\"text-center text-sm\">\n                    <div class=\"w-10 text-white bg-green-300 rounded-lg px-0 py-2\">\n                            ").concat(comments_count, "\n                        </div>\n                    </div>\n                </div>\n                <div class=\"flex mt-3\">\n                    <div class=\"grid gird-cols-3 text-sm text-gray-500\">\n                        <div><i class=\"fas fa-user mr-1\"></i>").concat(user, "</div>\n                        <div><i class=\"fas fa-heart mr-1\"></i>").concat(points, "</div>\n                        <div><i class=\"far fa-clock mr-1\"></i>").concat(time_ago, "</div>\n                    </div>\n                </div>\n            </div>\n            "));
     }
 
-    template = template.replace('{{__news_feed__}}', this.getHtml()); // template replace - news list content
+    this.setTemplateData('news_feed', this.getHtml()); // template replace - news list content
 
-    template = template.replace('{{__prev_page__}}', String(store.currentPage > 1 ? store.currentPage - 1 : 1)); // prev page 
+    this.setTemplateData('prev_page', String(store.currentPage > 1 ? store.currentPage - 1 : 1)); // prev page 
 
-    template = template.replace('{{__next_page__}}', String(store.currentPage + 1)); // next page
+    this.setTemplateData('next_page', String(store.currentPage + 1)); // next page
 
     updateView(template);
   };
@@ -310,7 +319,7 @@ function (_super) {
   __extends(NewsDetailView, _super);
 
   function NewsDetailView(containerId) {
-    var template = "\n        <div class=\"bg-gray-600 min-h-screen pb-8\">\n            <div class=\"bg-white text-xl\">\n                <div class=\"mx-auto px-4\">\n                    <div class=\"flex justify-between tiems-center py-6\">\n                        <div class=\"flex justify-start\">\n                            <h1 class=\"font-extrabold\">Hacker News</h1>\n                        </div>\n                        <div class=\"items-center justify-end\">\n                            <a href=\"#/page/".concat(store.currentPage, "\" class=\"text-gray-500\">\n                                <i class=\"fa fa-times\"></i>\n                            </a>\n                        </div>\n                    </div>\n                </div>\n            </div>\n\n            <div class=\"h-full border rounded-xl bg-white m-6 p-4\">\n                <h2>").concat(newsContent.title, "</h2>\n                <div class=\"text-gray-400 h-20\">\n                    ").concat(newsContent.content, "\n                </div>\n\n                {{__comments__}}\n            </div>\n        </div>\n        ");
+    var template = "\n        <div class=\"bg-gray-600 min-h-screen pb-8\">\n            <div class=\"bg-white text-xl\">\n                <div class=\"mx-auto px-4\">\n                    <div class=\"flex justify-between tiems-center py-6\">\n                        <div class=\"flex justify-start\">\n                            <h1 class=\"font-extrabold\">Hacker News</h1>\n                        </div>\n                        <div class=\"items-center justify-end\">\n                            <a href=\"#/page/{{__currentPage__}}\" class=\"text-gray-500\">\n                                <i class=\"fa fa-times\"></i>\n                            </a>\n                        </div>\n                    </div>\n                </div>\n            </div>\n\n            <div class=\"h-full border rounded-xl bg-white m-6 p-4\">\n                <h2>{{__title__}}</h2>\n                <div class=\"text-gray-400 h-20\">\n                    {{__content__}}\n                </div>\n\n                {{__comments__}}\n            </div>\n        </div>\n        ";
     return _super.call(this, containerId, template) || this;
   }
 
@@ -322,7 +331,7 @@ function (_super) {
 
     var api = new NewsDetailApi(); // class instance 생성
 
-    var newsContent = api.getData(id); // 피드 방문 처리
+    var newsDetail = api.getData(id); // 피드 방문 처리
 
     for (var i = 0; i < store.feeds.length; i++) {
       if (store.feeds[i].id === Number(id)) {
@@ -331,7 +340,11 @@ function (_super) {
       }
     }
 
-    this.updateView(template.replace('{{__comments__}}', this.makeComment(newsContent.comments)));
+    this.setTemplateData('comments', this.makeComment(newsDetail.comments));
+    this.setTemplateData('title', String(store.currentPage));
+    this.setTemplateData('title', newsDetail.title);
+    this.setTemplateData('content', newsDetail.content);
+    this.updateView();
   };
   /** 댓글 및 대댓글 생성 함수 */
 

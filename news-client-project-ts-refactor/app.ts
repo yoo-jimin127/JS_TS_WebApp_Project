@@ -73,9 +73,10 @@ class NewsDetailApi {
     }
 }
 
-// 공통 요소 클래스
+/** 공통 요소 클래스 */
 class View {
     template: string;
+    renderTemplate: string;
     container: HTMLElement;
     htmlList: string[]; // empty array -> html list append
 
@@ -88,11 +89,13 @@ class View {
 
         this.container = containerElement;
         this.template = template;
+        this.renderTemplate = template;
         this.htmlList = [];
     }
 
-    updateView(html: string): void {
-        this.container.innerHTML= html;
+    updateView(): void {
+        this.container.innerHTML= this.renderTemplate;
+        this.renderTemplate = this.template; // UI 업데이트 작업 후 원본 템플릿으로 복원
     }
 
     /** html 문자열 추가 함수 */
@@ -103,6 +106,11 @@ class View {
     /** 문자열 병합 값 리턴 함수 */
     getHtml(): string {
         return this.htmlList.join('');
+    }
+
+    /** template 내용 대체 함수 */
+    setTemplateData(key: string, value: string):void {
+        this.renderTemplate = this.template.replace(`{{__${key}__}}`, value);
     }
 }
 
@@ -171,9 +179,10 @@ class NewsFeedView extends View {
             `);
         }
 
-        template = template.replace('{{__news_feed__}}', this.getHtml()); // template replace - news list content
-        template = template.replace('{{__prev_page__}}', String(store.currentPage > 1 ? store.currentPage - 1 : 1)); // prev page 
-        template = template.replace('{{__next_page__}}', String(store.currentPage + 1)); // next page
+        this.setTemplateData('news_feed', this.getHtml()); // template replace - news list content
+        this.setTemplateData('prev_page', String(store.currentPage > 1 ? store.currentPage - 1 : 1)); // prev page 
+        this.setTemplateData('next_page', String(store.currentPage + 1)); // next page
+        
         updateView(template);
     }
 
@@ -196,7 +205,7 @@ class NewsDetailView extends View {
                             <h1 class="font-extrabold">Hacker News</h1>
                         </div>
                         <div class="items-center justify-end">
-                            <a href="#/page/${store.currentPage}" class="text-gray-500">
+                            <a href="#/page/{{__currentPage__}}" class="text-gray-500">
                                 <i class="fa fa-times"></i>
                             </a>
                         </div>
@@ -205,9 +214,9 @@ class NewsDetailView extends View {
             </div>
 
             <div class="h-full border rounded-xl bg-white m-6 p-4">
-                <h2>${newsContent.title}</h2>
+                <h2>{{__title__}}</h2>
                 <div class="text-gray-400 h-20">
-                    ${newsContent.content}
+                    {{__content__}}
                 </div>
 
                 {{__comments__}}
@@ -224,7 +233,7 @@ class NewsDetailView extends View {
 
         const id = location.hash.substr(7); // # 이후의 내용 저장
         const api = new NewsDetailApi(); // class instance 생성
-        const newsContent = api.getData(id);
+        const newsDetail: NewsDetail = api.getData(id);
 
         // 피드 방문 처리
         for (let i = 0; i < store.feeds.length; i++) {
@@ -234,7 +243,12 @@ class NewsDetailView extends View {
             }
         }
             
-        this.updateView(template.replace('{{__comments__}}', this.makeComment(newsContent.comments)));
+        this.setTemplateData('comments', this.makeComment(newsDetail.comments));
+        this.setTemplateData('title', String(store.currentPage));
+        this.setTemplateData('title', newsDetail.title);
+        this.setTemplateData('content', newsDetail.content);
+
+        this.updateView();
     }
 
     /** 댓글 및 대댓글 생성 함수 */
