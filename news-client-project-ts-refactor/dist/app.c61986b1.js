@@ -273,7 +273,15 @@ function (_super) {
 
   NewsFeedView.prototype.render = function () {
     for (var i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
-      this.addHtml("\n            <div class=\"p-6 ".concat(this.feeds[i].read ? 'bg-gray-400' : 'bg-white', " mt-6 rounded-lg shadow-md transition-colors duration-500 hover:bg-green-100\">\n                <div class=\"flex\">\n                    <div class=\"flex-auto\">\n                        <a href=\"#/show/").concat(this.feeds[i].id, "\">").concat(this.feeds[i].title, "</a>\n                    </div>\n                    <div class=\"text-center text-sm\">\n                    <div class=\"w-10 text-white bg-green-300 rounded-lg px-0 py-2\">\n                            ").concat(this.feeds[i].comments_count, "\n                        </div>\n                    </div>\n                </div>\n                <div class=\"flex mt-3\">\n                    <div class=\"grid gird-cols-3 text-sm text-gray-500\">\n                        <div><i class=\"fas fa-user mr-1\"></i>").concat(this.feeds[i].user, "</div>\n                        <div><i class=\"fas fa-heart mr-1\"></i>").concat(this.feeds[i].points, "</div>\n                        <div><i class=\"far fa-clock mr-1\"></i>").concat(this.feeds[i].time_ago, "</div>\n                    </div>\n                </div>\n            </div>\n            "));
+      var _a = this.feeds[i],
+          read = _a.read,
+          id = _a.id,
+          title = _a.title,
+          comments_count = _a.comments_count,
+          user = _a.user,
+          points = _a.points,
+          time_ago = _a.time_ago;
+      this.addHtml("\n            <div class=\"p-6 ".concat(read ? 'bg-gray-400' : 'bg-white', " mt-6 rounded-lg shadow-md transition-colors duration-500 hover:bg-green-100\">\n                <div class=\"flex\">\n                    <div class=\"flex-auto\">\n                        <a href=\"#/show/").concat(id, "\">").concat(title, "</a>\n                    </div>\n                    <div class=\"text-center text-sm\">\n                    <div class=\"w-10 text-white bg-green-300 rounded-lg px-0 py-2\">\n                            ").concat(comments_count, "\n                        </div>\n                    </div>\n                </div>\n                <div class=\"flex mt-3\">\n                    <div class=\"grid gird-cols-3 text-sm text-gray-500\">\n                        <div><i class=\"fas fa-user mr-1\"></i>").concat(user, "</div>\n                        <div><i class=\"fas fa-heart mr-1\"></i>").concat(points, "</div>\n                        <div><i class=\"far fa-clock mr-1\"></i>").concat(time_ago, "</div>\n                    </div>\n                </div>\n            </div>\n            "));
     }
 
     template = template.replace('{{__news_feed__}}', this.getHtml()); // template replace - news list content
