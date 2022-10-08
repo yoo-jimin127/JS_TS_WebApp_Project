@@ -105,12 +105,19 @@ class View {
 
     /** 문자열 병합 값 리턴 함수 */
     getHtml(): string {
-        return this.htmlList.join('');
+        const snapshot = this.htmlList.join('');
+        this.clearHtmlList(); // html list clear
+        return snapshot;
     }
 
     /** template 내용 대체 함수 */
     setTemplateData(key: string, value: string):void {
         this.renderTemplate = this.template.replace(`{{__${key}__}}`, value);
+    }
+
+    /** html list clear 함수 */
+    clearHtmlList(): void {
+        this.htmlList = [];
     }
 }
 

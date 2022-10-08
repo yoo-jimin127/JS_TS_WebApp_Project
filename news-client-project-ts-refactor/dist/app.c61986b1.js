@@ -242,13 +242,22 @@ function () {
 
 
   View.prototype.getHtml = function () {
-    return this.htmlList.join('');
+    var snapshot = this.htmlList.join('');
+    this.clearHtmlList(); // html list clear
+
+    return snapshot;
   };
   /** template 내용 대체 함수 */
 
 
   View.prototype.setTemplateData = function (key, value) {
     this.renderTemplate = this.template.replace("{{__".concat(key, "__}}"), value);
+  };
+  /** html list clear 함수 */
+
+
+  View.prototype.clearHtmlList = function () {
+    this.htmlList = [];
   };
 
   return View;
