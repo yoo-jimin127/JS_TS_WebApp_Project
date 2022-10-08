@@ -223,10 +223,17 @@ function () {
 
     this.container = containerElement;
     this.template = template;
+    this.htmlList = [];
   }
 
   View.prototype.updateView = function (html) {
     this.container.innerHTML = html;
+  };
+  /** html 문자열 추가 함수 */
+
+
+  View.prototype.addHtml = function (htmlString) {
+    this.htmlList.push(htmlString);
   };
 
   return View;
@@ -259,10 +266,8 @@ function (_super) {
 
 
   NewsFeedView.prototype.render = function () {
-    var newsList = []; // empty array
-
     for (var i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
-      newsList.push("\n                <div class=\"p-6 ".concat(newsFeed[i].read ? 'bg-gray-400' : 'bg-white', " mt-6 rounded-lg shadow-md transition-colors duration-500 hover:bg-green-100\">\n                    <div class=\"flex\">\n                        <div class=\"flex-auto\">\n                            <a href=\"#/show/").concat(newsFeed[i].id, "\">").concat(newsFeed[i].title, "</a>\n                        </div>\n                        <div class=\"text-center text-sm\">\n                        <div class=\"w-10 text-white bg-green-300 rounded-lg px-0 py-2\">\n                                ").concat(newsFeed[i].comments_count, "\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"flex mt-3\">\n                        <div class=\"grid gird-cols-3 text-sm text-gray-500\">\n                            <div><i class=\"fas fa-user mr-1\"></i>").concat(newsFeed[i].user, "</div>\n                            <div><i class=\"fas fa-heart mr-1\"></i>").concat(newsFeed[i].points, "</div>\n                            <div><i class=\"far fa-clock mr-1\"></i>").concat(newsFeed[i].time_ago, "</div>\n                        </div>\n                    </div>\n                </div>\n                "));
+      this.addHtml("\n            <div class=\"p-6 ".concat(newsFeed[i].read ? 'bg-gray-400' : 'bg-white', " mt-6 rounded-lg shadow-md transition-colors duration-500 hover:bg-green-100\">\n                <div class=\"flex\">\n                    <div class=\"flex-auto\">\n                        <a href=\"#/show/").concat(newsFeed[i].id, "\">").concat(newsFeed[i].title, "</a>\n                    </div>\n                    <div class=\"text-center text-sm\">\n                    <div class=\"w-10 text-white bg-green-300 rounded-lg px-0 py-2\">\n                            ").concat(newsFeed[i].comments_count, "\n                        </div>\n                    </div>\n                </div>\n                <div class=\"flex mt-3\">\n                    <div class=\"grid gird-cols-3 text-sm text-gray-500\">\n                        <div><i class=\"fas fa-user mr-1\"></i>").concat(newsFeed[i].user, "</div>\n                        <div><i class=\"fas fa-heart mr-1\"></i>").concat(newsFeed[i].points, "</div>\n                        <div><i class=\"far fa-clock mr-1\"></i>").concat(newsFeed[i].time_ago, "</div>\n                    </div>\n                </div>\n            </div>\n            "));
     }
 
     template = template.replace('{{__news_feed__}}', newsList.join('')); // template replace - news list content

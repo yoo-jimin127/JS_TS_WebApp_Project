@@ -77,6 +77,7 @@ class NewsDetailApi {
 class View {
     template: string;
     container: HTMLElement;
+    htmlList: string[]; // empty array -> html list append
 
     constructor(containerId: string, template: string) {
         const containerElement = document.getElementById(containerId);
@@ -87,10 +88,16 @@ class View {
 
         this.container = containerElement;
         this.template = template;
+        this.htmlList = [];
     }
 
     updateView(html: string): void {
         this.container.innerHTML= html;
+    }
+
+    /** html 문자열 추가 함수 */
+    addHtml(htmlString: string): void {
+        this.htmlList.push(htmlString);
     }
 }
 
@@ -130,40 +137,38 @@ class NewsFeedView extends View {
         }
     }
 
-        /** 뉴스 목록 호출 함수 */
-        render(): void {
-            const newsList: string[] = []; // empty array
-
-            for (let i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
-                newsList.push(
-                `
-                <div class="p-6 ${newsFeed[i].read ? 'bg-gray-400' : 'bg-white'} mt-6 rounded-lg shadow-md transition-colors duration-500 hover:bg-green-100">
-                    <div class="flex">
-                        <div class="flex-auto">
-                            <a href="#/show/${newsFeed[i].id}">${newsFeed[i].title}</a>
-                        </div>
-                        <div class="text-center text-sm">
-                        <div class="w-10 text-white bg-green-300 rounded-lg px-0 py-2">
-                                ${newsFeed[i].comments_count}
-                            </div>
-                        </div>
+    /** 뉴스 목록 호출 함수 */
+    render(): void {
+    
+        for (let i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
+            this.addHtml(
+            `
+            <div class="p-6 ${newsFeed[i].read ? 'bg-gray-400' : 'bg-white'} mt-6 rounded-lg shadow-md transition-colors duration-500 hover:bg-green-100">
+                <div class="flex">
+                    <div class="flex-auto">
+                        <a href="#/show/${newsFeed[i].id}">${newsFeed[i].title}</a>
                     </div>
-                    <div class="flex mt-3">
-                        <div class="grid gird-cols-3 text-sm text-gray-500">
-                            <div><i class="fas fa-user mr-1"></i>${newsFeed[i].user}</div>
-                            <div><i class="fas fa-heart mr-1"></i>${newsFeed[i].points}</div>
-                            <div><i class="far fa-clock mr-1"></i>${newsFeed[i].time_ago}</div>
+                    <div class="text-center text-sm">
+                    <div class="w-10 text-white bg-green-300 rounded-lg px-0 py-2">
+                            ${newsFeed[i].comments_count}
                         </div>
                     </div>
                 </div>
-                `);
-            }
+                <div class="flex mt-3">
+                    <div class="grid gird-cols-3 text-sm text-gray-500">
+                        <div><i class="fas fa-user mr-1"></i>${newsFeed[i].user}</div>
+                        <div><i class="fas fa-heart mr-1"></i>${newsFeed[i].points}</div>
+                        <div><i class="far fa-clock mr-1"></i>${newsFeed[i].time_ago}</div>
+                    </div>
+                </div>
+            </div>
+            `);
+        }
 
-            template = template.replace('{{__news_feed__}}', newsList.join('')); // template replace - news list content
-            template = template.replace('{{__prev_page__}}', String(store.currentPage > 1 ? store.currentPage - 1 : 1)); // prev page 
-            template = template.replace('{{__next_page__}}', String(store.currentPage + 1)); // next page
-
-            updateView(template);
+        template = template.replace('{{__news_feed__}}', newsList.join('')); // template replace - news list content
+        template = template.replace('{{__prev_page__}}', String(store.currentPage > 1 ? store.currentPage - 1 : 1)); // prev page 
+        template = template.replace('{{__next_page__}}', String(store.currentPage + 1)); // next page
+        updateView(template);
     }
 
     /** 방문 페이지 상태 관리 함수 */
