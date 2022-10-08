@@ -182,9 +182,39 @@ function () {
   };
 
   return NewsDetailApi;
-}(); // apply mixin
+}();
 
+var NewsFeedView =
+/** @class */
+function () {
+  function NewsFeedView() {
+    this.template = template.replace('{{__news_feed__}}', newsList.join('')); // template replace - news list content
 
+    this.template = template.replace('{{__prev_page__}}', String(store.currentPage > 1 ? store.currentPage - 1 : 1)); // prev page 
+
+    this.template = template.replace('{{__next_page__}}', String(store.currentPage + 1)); // next page
+
+    var newsFeed = store.feeds; // json 데이터 객체 변환 후 리턴
+
+    var newsList = []; // empty array
+    // NewsFeedApi class instance
+
+    var api = new NewsFeedApi();
+    var template = "\n        <div class=\"bg-gray-600 min-h-screen\">\n            <div class=\"bg-white text-xl\">\n                <div class=\"mx-auto px-4\">\n                    <div class=\"flex justify-between items-center py-6\">\n                        <div class=\"flex justify-start\">\n                            <h1 class=\"font-extrabold\">Hacker News</h1>\n                        </div>\n                        <div class=\"item-center justify-end\">\n                            <a href=\"#/page/{{__prev_page__}}\" class=\"text-gray-500\">Previous</a>\n                            <a href=\"#/page/{{__next_page__}}\" class=\"text-gray-500 ml-4\">Next</a>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"p-4 text-2xl text-gray-700\">{{__news_feed__}}</div>\n        </div>\n    "; // 최초 접근의 경우
+
+    if (newsFeed.length === 0) {
+      newsFeed = store.feeds = makeFeeds(api.getData());
+    }
+
+    render();
+    void {};
+  }
+
+  return NewsFeedView;
+}();
+
+;
+;
 applyApiMixins(NewsFeedApi, [Api]);
 applyApiMixins(NewsDetailApi, [Api]);
 /** 방문 페이지 상태 관리 함수 */
@@ -320,7 +350,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54294" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57316" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

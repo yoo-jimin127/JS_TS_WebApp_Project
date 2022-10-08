@@ -74,34 +74,28 @@ class NewsDetailApi {
     }
 }
 
-// apply mixin
-interface NewsFeedApi extends Api{};
-interface NewsDetailApi extends Api{};
+// 공통 요소 클래스
+class View {
+    template: string;
+    container: HTMLElement;
 
-applyApiMixins(NewsFeedApi, [Api]);
-applyApiMixins(NewsDetailApi, [Api]);
-
-/** 방문 페이지 상태 관리 함수 */
-function makeFeeds(feeds: NewsFeed[]): NewsFeed[] {
-    for (let i = 0; i < feeds.length; i++) {
-        feeds[i].read = false;
+    constructor() {
+        
     }
-    return feeds;
-}
 
-/** view 업데이트 함수 */
-function updateView(html: string): void {
-    if (container != null) {
-        container.innerHTML = html;
-    } else {
-        console.log('최상위 컨테이너가 없어 UI를 진행하지 못합니다.');
+    updateView(html: string): void {
+        if (container) {
+            container.innerHTML = html;
+        } else {
+            console.error("최상위 컨테이너가 없어 UI 업데이트를 진행하지 못합니다.")
+        }
     }
 }
 
-/** 뉴스 목록 호출 함수 */
-function getNewsFeed(): void {
+class NewsFeedView extends View {
+    constructor() {
     let newsFeed: NewsFeed[] = store.feeds; // json 데이터 객체 변환 후 리턴
-    const newsList: string[] = []; // empty array
+    
     // NewsFeedApi class instance
     const api = new NewsFeedApi();
 
@@ -129,36 +123,141 @@ function getNewsFeed(): void {
         newsFeed = store.feeds = makeFeeds(api.getData());
     }
 
-    for (let i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
-        newsList.push(
-        `
-        <div class="p-6 ${newsFeed[i].read ? 'bg-gray-400' : 'bg-white'} mt-6 rounded-lg shadow-md transition-colors duration-500 hover:bg-green-100">
-            <div class="flex">
-                <div class="flex-auto">
-                    <a href="#/show/${newsFeed[i].id}">${newsFeed[i].title}</a>
-                </div>
-                <div class="text-center text-sm">
+    /** 뉴스 목록 호출 함수 */
+    render(): void {
+        const newsList: string[] = []; // empty array
+        for (let i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
+            newsList.push(
+            `
+            <div class="p-6 ${newsFeed[i].read ? 'bg-gray-400' : 'bg-white'} mt-6 rounded-lg shadow-md transition-colors duration-500 hover:bg-green-100">
+                <div class="flex">
+                    <div class="flex-auto">
+                        <a href="#/show/${newsFeed[i].id}">${newsFeed[i].title}</a>
+                    </div>
+                    <div class="text-center text-sm">
                     <div class="w-10 text-white bg-green-300 rounded-lg px-0 py-2">
-                        ${newsFeed[i].comments_count}
+                            ${newsFeed[i].comments_count}
+                        </div>
+                    </div>
+                </div>
+                <div class="flex mt-3">
+                    <div class="grid gird-cols-3 text-sm text-gray-500">
+                        <div><i class="fas fa-user mr-1"></i>${newsFeed[i].user}</div>
+                        <div><i class="fas fa-heart mr-1"></i>${newsFeed[i].points}</div>
+                        <div><i class="far fa-clock mr-1"></i>${newsFeed[i].time_ago}</div>
                     </div>
                 </div>
             </div>
-            <div class="flex mt-3">
-                <div class="grid gird-cols-3 text-sm text-gray-500">
-                    <div><i class="fas fa-user mr-1"></i>${newsFeed[i].user}</div>
-                    <div><i class="fas fa-heart mr-1"></i>${newsFeed[i].points}</div>
-                    <div><i class="far fa-clock mr-1"></i>${newsFeed[i].time_ago}</div>
-                </div>
-            </div>
-        </div>
-        `);
+            `);
+        }
+
+        template = template.replace('{{__news_feed__}}', newsList.join('')); // template replace - news list content
+        template = template.replace('{{__prev_page__}}', String(store.currentPage > 1 ? store.currentPage - 1 : 1)); // prev page 
+        template = template.replace('{{__next_page__}}', String(store.currentPage + 1)); // next page
+        
+        updateView(template);
     }
 
-    template = template.replace('{{__news_feed__}}', newsList.join('')); // template replace - news list content
-    template = template.replace('{{__prev_page__}}', String(store.currentPage > 1 ? store.currentPage - 1 : 1)); // prev page 
-    template = template.replace('{{__next_page__}}', String(store.currentPage + 1)); // next page
-    
-    updateView(template);
+    /** 방문 페이지 상태 관리 함수 */
+    makeFeeds(feeds: NewsFeed[]): NewsFeed[] {
+        for (let i = 0; i < feeds.length; i++) {
+            feeds[i].read = false;
+        }
+        return feeds;
+    }
+}
+
+class NewsDetailView extends View {
+    constructor() {    
+        let template = `
+        <div class="bg-gray-600 min-h-screen pb-8">
+            <div class="bg-white text-xl">
+                <div class="mx-auto px-4">
+                    <div class="flex justify-between tiems-center py-6">
+                        <div class="flex justify-start">
+                            <h1 class="font-extrabold">Hacker News</h1>
+                        </div>
+                        <div class="items-center justify-end">
+                            <a href="#/page/${store.currentPage}" class="text-gray-500">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="h-full border rounded-xl bg-white m-6 p-4">
+                <h2>${newsContent.title}</h2>
+                <div class="text-gray-400 h-20">
+                    ${newsContent.content}
+                </div>
+
+                {{__comments__}}
+            </div>
+        </div>
+        `;
+    }
+
+    render(): void {
+        console.log('hash changed')
+        console.log(location.hash); // location 객체의 hash 값 확인 #3029303929 와 같은 방식으로 값 반환
+
+        const id = location.hash.substr(7); // # 이후의 내용 저장
+        const api = new NewsDetailApi(); // class instance 생성
+        const newsContent = api.getData(id);
+
+        // 피드 방문 처리
+        for (let i = 0; i < store.feeds.length; i++) {
+            if (store.feeds[i].id === Number(id)) {
+                store.feeds[i].read = true;
+                break;
+            }
+        }
+            
+        updateView(template.replace('{{__comments__}}', makeComment(newsContent.comments)));
+    }
+
+    /** 댓글 및 대댓글 생성 함수 */
+    makeComment(comments: NewsComment[]): string {
+        const commentString: string[] = []; //comment array
+
+        for (let i = 0; i < comments.length; i++) {
+            const comment: NewsComment = comments[i];
+
+            commentString.push(`
+                <div style="padding-left: ${comment.level * 40}px;" class="mt-4">
+                    <div class="text-gray-400">
+                        <i class="fa fa-sort-up mr-2"></i>
+                        <strong>${comment.user}</strong> ${comment.time_ago}
+                    </div>
+                    <p class="text-gray-700">${comment.content}</p>
+                </div>
+            `);
+        
+            // 대댓글 처리
+            if (comments[i].comments.length > 0) {
+                commentString.push(makeComment(comment.comments));
+            }
+        }
+
+        return commentString.join('');
+    }
+}
+
+// apply mixin
+interface NewsFeedApi extends Api{};
+interface NewsDetailApi extends Api{};
+
+applyApiMixins(NewsFeedApi, [Api]);
+applyApiMixins(NewsDetailApi, [Api]);
+
+/** view 업데이트 함수 */
+function updateView(html: string): void {
+    if (container != null) {
+        container.innerHTML = html;
+    } else {
+        console.log('최상위 컨테이너가 없어 UI를 진행하지 못합니다.');
+    }
 }
 
 /** 기사별 세부 페이지 함수 */
@@ -207,32 +306,6 @@ function getNewsDetail(): void {
     }
     
     updateView(template.replace('{{__comments__}}', makeComment(newsContent.comments)));
-}
-
-/** 댓글 및 대댓글 생성 함수 */
-function makeComment(comments: NewsComment[]): string {
-    const commentString: string[] = []; //comment array
-
-    for (let i = 0; i < comments.length; i++) {
-        const comment: NewsComment = comments[i];
-
-        commentString.push(`
-            <div style="padding-left: ${comment.level * 40}px;" class="mt-4">
-                <div class="text-gray-400">
-                    <i class="fa fa-sort-up mr-2"></i>
-                    <strong>${comment.user}</strong> ${comment.time_ago}
-                </div>
-                <p class="text-gray-700">${comment.content}</p>
-            </div>
-        `);
-        
-        // 대댓글 처리
-        if (comments[i].comments.length > 0) {
-            commentString.push(makeComment(comment.comments));
-        }
-    }
-
-    return commentString.join('');
 }
 
 function router(): void {
