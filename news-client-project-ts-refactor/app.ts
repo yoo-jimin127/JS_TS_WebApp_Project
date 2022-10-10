@@ -299,7 +299,7 @@ class NewsDetailView extends View {
         }
             
         this.setTemplateData('comments', this.makeComment(newsDetail.comments));
-        this.setTemplateData('title', String(store.currentPage));
+        this.setTemplateData('currentPage', String(store.currentPage));
         this.setTemplateData('title', newsDetail.title);
         this.setTemplateData('content', newsDetail.content);
 
