@@ -1,5 +1,3 @@
-const ajax: XMLHttpRequest = new XMLHttpRequest(); // ajax 출력 결과 반환
-
 const store: Store  = {
     currentPage: 1,
     feeds: [],

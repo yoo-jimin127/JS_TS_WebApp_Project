@@ -385,3 +385,18 @@ interface Store {
                 ```
 
 - 코드 파일의 분리
+    - src
+        - core
+            - api
+            - router
+            - view
+        - page
+            - pages...
+        - types
+            - index
+        - app
+        - config
+
+    - 모듈 스펙 : `import` / `export`
+        - `import` : 다른 파일에 있는 특정 class or 값을 가져오는 문법
+        - `export` : 해당 파일을 import할 수 있도록 부여하는 권한 문법
