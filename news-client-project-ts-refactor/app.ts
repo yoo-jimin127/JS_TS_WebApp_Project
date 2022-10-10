@@ -117,7 +117,7 @@ abstract class View {
 
     /** template 내용 대체 함수 */
     setTemplateData(key: string, value: string):void {
-        this.renderTemplate = this.template.replace(`{{__${key}__}}`, value);
+        this.renderTemplate = this.renderTemplate.replace(`{{__${key}__}}`, value);
     }
 
     /** html list clear 함수 */
@@ -133,7 +133,7 @@ class Router {
     defaultRoute : RouteInfo | null;
 
     constructor() {
-        window.addEventListener('hashchange', this.route);
+        window.addEventListener('hashchange', this.route.bind(this)); // 등록 시점의 this context 고정
 
         this.routeTable= [];
         this.defaultRoute = null;
@@ -204,6 +204,9 @@ class NewsFeedView extends View {
 
     /** 뉴스 목록 호출 함수 */
     render(): void {
+        // 디폴트 페이징 예외 처리
+        store.currentPage = Number(location.hash.substr(7) || 1);
+
         for (let i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
             const {read, id, title, comments_count, user, points, time_ago} = this.feeds[i];
 
@@ -389,5 +392,8 @@ const newsFeedView = new NewsFeedView('root');
 const newsDetailView = new NewsDetailView('root');
 
 router.setDefaultPage(newsFeedView); // default page set
+
 router.addRoutePath('/page/', newsFeedView);
 router.addRoutePath('/show/', newsDetailView);
+
+router.route(); // 실행

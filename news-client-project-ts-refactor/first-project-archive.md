@@ -349,3 +349,21 @@ interface Store {
     - UI 업데이트를 위한 보조적 작업 수행 함수
     - 라우터 함수
 2. 클래스 생성 (camel-case 작성)
+
+- `bind()` : 
+    - 메소드가 호출되면 새로운 함수 생성
+    - 받게되는 첫 인자의 value로는 this 키워드를 설정하고, 이어지는 인자들은 바인드된 함수의 인수에 제공됨
+    ```ts
+    class Router {
+    routeTable: RouteInfo[];
+    defaultRoute : RouteInfo | null;
+
+    constructor() {
+        window.addEventListener('hashchange', this.route.bind(this));
+
+        this.routeTable= [];
+        this.defaultRoute = null;
+    }
+    ...
+    }
+    ```

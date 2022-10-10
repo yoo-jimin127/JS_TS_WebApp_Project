@@ -251,7 +251,7 @@ function () {
 
 
   View.prototype.setTemplateData = function (key, value) {
-    this.renderTemplate = this.template.replace("{{__".concat(key, "__}}"), value);
+    this.renderTemplate = this.renderTemplate.replace("{{__".concat(key, "__}}"), value);
   };
   /** html list clear 함수 */
 
@@ -267,7 +267,8 @@ var Router =
 /** @class */
 function () {
   function Router() {
-    window.addEventListener('hashchange', this.route);
+    window.addEventListener('hashchange', this.route.bind(this)); // 등록 시점의 this context 고정
+
     this.routeTable = [];
     this.defaultRoute = null;
   }
@@ -339,6 +340,9 @@ function (_super) {
 
 
   NewsFeedView.prototype.render = function () {
+    // 디폴트 페이징 예외 처리
+    store.currentPage = Number(location.hash.substr(7) || 1);
+
     for (var i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
       var _a = this.feeds[i],
           read = _a.read,
@@ -458,6 +462,7 @@ router.setDefaultPage(newsFeedView); // default page set
 
 router.addRoutePath('/page/', newsFeedView);
 router.addRoutePath('/show/', newsDetailView);
+router.route(); // 실행
 },{}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -486,7 +491,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57316" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58885" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
