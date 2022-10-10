@@ -367,3 +367,19 @@ interface Store {
     ...
     }
     ```
+
+- 접근 제어
+    - `protected`, `public` ... : 기본 값 public
+    - 외부 접근
+        - View 클래스 외부의 인스턴스 객체로 접근하는 경우
+            1. 상속받은 자식 class 안에서 접근하는 경우
+            2. 상속관계가 없는 바깥쪽에서 인스턴스 객체에 접근하는 경우
+                - `private` 속성 접근자 : 자식에서도 접근하지 못하도록
+                
+                ```ts
+                const router: Router = new Router();
+                const newsFeedView = new NewsFeedView('root');
+                const newsDetailView = new NewsDetailView('root');
+
+                newsDetailView.container // 상속관계가 없는 바깥쪽에서 인스턴스 객체 접근 제어
+                ```
