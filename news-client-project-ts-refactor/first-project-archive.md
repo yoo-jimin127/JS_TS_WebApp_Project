@@ -375,7 +375,7 @@ interface Store {
             1. 상속받은 자식 class 안에서 접근하는 경우
             2. 상속관계가 없는 바깥쪽에서 인스턴스 객체에 접근하는 경우
                 - `private` 속성 접근자 : 자식에서도 접근하지 못하도록
-                
+
                 ```ts
                 const router: Router = new Router();
                 const newsFeedView = new NewsFeedView('root');
@@ -383,3 +383,5 @@ interface Store {
 
                 newsDetailView.container // 상속관계가 없는 바깥쪽에서 인스턴스 객체 접근 제어
                 ```
+
+- 코드 파일의 분리
