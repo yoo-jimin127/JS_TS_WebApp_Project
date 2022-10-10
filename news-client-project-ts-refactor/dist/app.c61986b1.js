@@ -263,6 +263,55 @@ function () {
   return View;
 }();
 
+var Router =
+/** @class */
+function () {
+  function Router() {
+    window.addEventListener('hashchange', this.route);
+    this.routeTable = [];
+    this.defaultRoute = null;
+  }
+  /** view update */
+
+
+  Router.prototype.addRoutePath = function (path, page) {
+    this.routeTable.push({
+      path: path,
+      page: page
+    });
+  };
+  /** default page set */
+
+
+  Router.prototype.setDefaultPage = function (page) {
+    this.defaultRoute = {
+      path: '',
+      page: page
+    };
+  };
+  /** route execute function */
+
+
+  Router.prototype.route = function () {
+    var routePath = location.hash;
+
+    if (routePath === '' && this.defaultRoute) {
+      this.defaultRoute.page.render();
+    }
+
+    for (var _i = 0, _a = this.routeTable; _i < _a.length; _i++) {
+      var routeInfo = _a[_i];
+
+      if (routePath.indexOf(routeInfo.path) >= 0) {
+        routeInfo.page.render();
+        break;
+      }
+    }
+  };
+
+  return Router;
+}();
+
 var NewsFeedView =
 /** @class */
 function (_super) {
@@ -308,7 +357,7 @@ function (_super) {
 
     this.setTemplateData('next_page', String(store.currentPage + 1)); // next page
 
-    updateView(template);
+    this.updateView();
   };
   /** 방문 페이지 상태 관리 함수 */
 
@@ -378,17 +427,7 @@ function (_super) {
 ;
 applyApiMixins(NewsFeedApi, [Api]);
 applyApiMixins(NewsDetailApi, [Api]);
-/** view 업데이트 함수 */
-
-function updateView(html) {
-  if (container != null) {
-    container.innerHTML = html;
-  } else {
-    console.log('최상위 컨테이너가 없어 UI를 진행하지 못합니다.');
-  }
-}
 /** 기사별 세부 페이지 함수 */
-
 
 function getNewsDetail() {
   console.log('hash changed');
@@ -408,26 +447,17 @@ function getNewsDetail() {
     }
   }
 
-  updateView(template.replace('{{__comments__}}', makeComment(newsContent.comments)));
+  this.getHtml('comments', this.makeComment(newsContent.comments));
+  this.updateView();
 }
 
-function router() {
-  var routePath = location.hash;
+var router = new Router();
+var newsFeedView = new NewsFeedView('root');
+var newsDetailView = new NewsDetailView('root');
+router.setDefaultPage(newsFeedView); // default page set
 
-  if (routePath === '') {
-    // location.hash === # 일 경우 빈 값 반환
-    getNewsFeed();
-  } else if (routePath.indexOf('#/page/') >= 0) {
-    store.currentPage = Number(routePath.substr(7));
-    getNewsFeed();
-  } else {
-    getNewsDetail();
-  }
-}
-
-window.addEventListener('hashchange', router); // router : hash의 변경마다 보여줌
-
-router();
+router.addRoutePath('/page/', newsFeedView);
+router.addRoutePath('/show/', newsDetailView);
 },{}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';

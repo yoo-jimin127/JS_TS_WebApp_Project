@@ -27,6 +27,11 @@ interface NewsComment extends News {
     readonly level: number;
 }
 
+interface RouteInfo {
+    path: string;
+    page: View;
+}
+
 const ajax: XMLHttpRequest = new XMLHttpRequest(); // ajax 출력 결과 반환
 // const content = document.createElement('div');
 const URL_ADDR: string = 'https://api.hnpwa.com/v0/news/1.json';
@@ -74,7 +79,7 @@ class NewsDetailApi {
 }
 
 /** 공통 요소 클래스 */
-class View {
+abstract class View {
     template: string;
     renderTemplate: string;
     container: HTMLElement;
@@ -118,6 +123,46 @@ class View {
     /** html list clear 함수 */
     clearHtmlList(): void {
         this.htmlList = [];
+    }
+
+    abstract render(): void; // abstract method
+}
+
+class Router {
+    routeTable: RouteInfo[];
+    defaultRoute : RouteInfo | null;
+
+    constructor() {
+        window.addEventListener('hashchange', this.route);
+
+        this.routeTable= [];
+        this.defaultRoute = null;
+    }
+
+    /** view update */
+    addRoutePath(path: string, page: View): void {
+        this.routeTable.push({ path, page });
+    }
+
+    /** default page set */
+    setDefaultPage(page: View): void {
+        this.defaultRoute = { path: '', page };
+    }
+
+    /** route execute function */
+    route() {
+        const routePath = location.hash;
+
+        if (routePath === '' && this.defaultRoute) {
+            this.defaultRoute.page.render();
+        }
+
+        for (const routeInfo of this.routeTable) {
+            if (routePath.indexOf(routeInfo.path) >= 0) {
+                routeInfo.page.render();
+                break;
+            }
+        }
     }
 }
 
@@ -190,7 +235,7 @@ class NewsFeedView extends View {
         this.setTemplateData('prev_page', String(store.currentPage > 1 ? store.currentPage - 1 : 1)); // prev page 
         this.setTemplateData('next_page', String(store.currentPage + 1)); // next page
         
-        updateView(template);
+        this.updateView();
     }
 
     /** 방문 페이지 상태 관리 함수 */
@@ -290,15 +335,6 @@ interface NewsDetailApi extends Api{};
 applyApiMixins(NewsFeedApi, [Api]);
 applyApiMixins(NewsDetailApi, [Api]);
 
-/** view 업데이트 함수 */
-function updateView(html: string): void {
-    if (container != null) {
-        container.innerHTML = html;
-    } else {
-        console.log('최상위 컨테이너가 없어 UI를 진행하지 못합니다.');
-    }
-}
-
 /** 기사별 세부 페이지 함수 */
 function getNewsDetail(): void {
     console.log('hash changed')
@@ -344,24 +380,14 @@ function getNewsDetail(): void {
         }
     }
     
-    updateView(template.replace('{{__comments__}}', makeComment(newsContent.comments)));
+    this.getHtml('comments', this.makeComment(newsContent.comments));
+    this.updateView();
 }
 
-function router(): void {
-    const routePath = location.hash;
+const router: Router = new Router();
+const newsFeedView = new NewsFeedView('root');
+const newsDetailView = new NewsDetailView('root');
 
-    if(routePath === '') {
-        // location.hash === # 일 경우 빈 값 반환
-        getNewsFeed();
-    }
-    else if (routePath.indexOf('#/page/') >= 0) {
-        store.currentPage = Number(routePath.substr(7));
-        getNewsFeed();
-    }
-    else {
-        getNewsDetail();
-    }
-}
-
-window.addEventListener('hashchange', router); // router : hash의 변경마다 보여줌
-router();
+router.setDefaultPage(newsFeedView); // default page set
+router.addRoutePath('/page/', newsFeedView);
+router.addRoutePath('/show/', newsDetailView);
