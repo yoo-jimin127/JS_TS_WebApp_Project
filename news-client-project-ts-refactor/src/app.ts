@@ -1,41 +1,5 @@
-interface Store {
-    currentPage: number;
-    feeds: NewsFeed[];
-}
-
-interface News {
-    readonly id: number;
-    readonly time_ago: string;
-    readonly title: string;
-    readonly url: string;
-    readonly user: string;
-    readonly content: string;
-}
-
-interface NewsFeed extends News {
-    readonly comments_count: number;
-    readonly points: number;
-    read?: boolean;
-}
-
-interface NewsDetail extends News {
-    readonly comments: [];
-}
-
-interface NewsComment extends News {
-    readonly comments: [];
-    readonly level: number;
-}
-
-interface RouteInfo {
-    path: string;
-    page: View;
-}
-
 const ajax: XMLHttpRequest = new XMLHttpRequest(); // ajax 출력 결과 반환
 // const content = document.createElement('div');
-const URL_ADDR: string = 'https://api.hnpwa.com/v0/news/1.json';
-const CONTENT_URL: string = 'https://api.hnpwa.com/v0/item/@id.json'; // 해당 콘텐츠의 url
 
 /** 공유 자원 관리 */
 const store: Store  = {
