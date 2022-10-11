@@ -1,3 +1,5 @@
+import View from "../core/view";
+
 export interface Store {
     currentPage: number;
     feeds: NewsFeed[];
