@@ -46,15 +46,15 @@ export default class NewsDetailView extends View {
         const newsDetail: NewsDetail = api.getData(id);
 
         // 피드 방문 처리
-        for (let i = 0; i < store.feeds.length; i++) {
-            if (store.feeds[i].id === Number(id)) {
-                store.feeds[i].read = true;
+        for (let i = 0; i < window.store.feeds.length; i++) {
+            if (window.store.feeds[i].id === Number(id)) {
+                window.store.feeds[i].read = true;
                 break;
             }
         }
             
         this.setTemplateData('comments', this.makeComment(newsDetail.comments));
-        this.setTemplateData('currentPage', String(store.currentPage));
+        this.setTemplateData('currentPage', String(window.store.currentPage));
         this.setTemplateData('title', newsDetail.title);
         this.setTemplateData('content', newsDetail.content);
 
@@ -104,7 +104,7 @@ function getNewsDetail(): void {
                         <h1 class="font-extrabold">Hacker News</h1>
                     </div>
                     <div class="items-center justify-end">
-                        <a href="#/page/${store.currentPage}" class="text-gray-500">
+                        <a href="#/page/${window.store.currentPage}" class="text-gray-500">
                             <i class="fa fa-times"></i>
                         </a>
                     </div>
@@ -124,9 +124,9 @@ function getNewsDetail(): void {
     `;
 
     // 피드 방문 처리
-    for (let i = 0; i < store.feeds.length; i++) {
-        if (store.feeds[i].id === Number(id)) {
-            store.feeds[i].read = true;
+    for (let i = 0; i < window.store.feeds.length; i++) {
+        if (window.store.feeds[i].id === Number(id)) {
+            window.store.feeds[i].read = true;
             break;
         }
     }

@@ -7,6 +7,14 @@ const store: Store  = {
     feeds: [],
 };
 
+// 전역 스토어 설정
+declare global {
+    interface Window {
+        store: Store;
+    }
+}
+window.store = store;
+
 const router: Router = new Router();
 const newsFeedView = new NewsFeedView('root');
 const newsDetailView = new NewsDetailView('root');

@@ -419,15 +419,15 @@ function (_super) {
 
     var newsDetail = api.getData(id); // 피드 방문 처리
 
-    for (var i = 0; i < store.feeds.length; i++) {
-      if (store.feeds[i].id === Number(id)) {
-        store.feeds[i].read = true;
+    for (var i = 0; i < window.store.feeds.length; i++) {
+      if (window.store.feeds[i].id === Number(id)) {
+        window.store.feeds[i].read = true;
         break;
       }
     }
 
     this.setTemplateData('comments', this.makeComment(newsDetail.comments));
-    this.setTemplateData('currentPage', String(store.currentPage));
+    this.setTemplateData('currentPage', String(window.store.currentPage));
     this.setTemplateData('title', newsDetail.title);
     this.setTemplateData('content', newsDetail.content);
     this.updateView();
@@ -463,11 +463,11 @@ function getNewsDetail() {
   var api = new api_1.NewsDetailApi('GET', config_1.CONTENT_URL, false); // class instance 생성
 
   var newsContent = api.getData(id);
-  var template = "\n    <div class=\"bg-gray-600 min-h-screen pb-8\">\n        <div class=\"bg-white text-xl\">\n            <div class=\"mx-auto px-4\">\n                <div class=\"flex justify-between tiems-center py-6\">\n                    <div class=\"flex justify-start\">\n                        <h1 class=\"font-extrabold\">Hacker News</h1>\n                    </div>\n                    <div class=\"items-center justify-end\">\n                        <a href=\"#/page/".concat(store.currentPage, "\" class=\"text-gray-500\">\n                            <i class=\"fa fa-times\"></i>\n                        </a>\n                    </div>\n                </div>\n            </div>\n        </div>\n\n        <div class=\"h-full border rounded-xl bg-white m-6 p-4\">\n            <h2>").concat(newsContent.title, "</h2>\n            <div class=\"text-gray-400 h-20\">\n                ").concat(newsContent.content, "\n            </div>\n\n            {{__comments__}}\n        </div>\n    </div>\n    "); // 피드 방문 처리
+  var template = "\n    <div class=\"bg-gray-600 min-h-screen pb-8\">\n        <div class=\"bg-white text-xl\">\n            <div class=\"mx-auto px-4\">\n                <div class=\"flex justify-between tiems-center py-6\">\n                    <div class=\"flex justify-start\">\n                        <h1 class=\"font-extrabold\">Hacker News</h1>\n                    </div>\n                    <div class=\"items-center justify-end\">\n                        <a href=\"#/page/".concat(window.store.currentPage, "\" class=\"text-gray-500\">\n                            <i class=\"fa fa-times\"></i>\n                        </a>\n                    </div>\n                </div>\n            </div>\n        </div>\n\n        <div class=\"h-full border rounded-xl bg-white m-6 p-4\">\n            <h2>").concat(newsContent.title, "</h2>\n            <div class=\"text-gray-400 h-20\">\n                ").concat(newsContent.content, "\n            </div>\n\n            {{__comments__}}\n        </div>\n    </div>\n    "); // 피드 방문 처리
 
-  for (var i = 0; i < store.feeds.length; i++) {
-    if (store.feeds[i].id === Number(id)) {
-      store.feeds[i].read = true;
+  for (var i = 0; i < window.store.feeds.length; i++) {
+    if (window.store.feeds[i].id === Number(id)) {
+      window.store.feeds[i].read = true;
       break;
     }
   }
@@ -532,13 +532,13 @@ function (_super) {
   function NewsFeedView(containerId) {
     var _this = _super.call(this, containerId, template) || this;
 
-    _this.feeds = store.feeds; // json 데이터 객체 변환 후 리턴
+    _this.feeds = window.store.feeds; // json 데이터 객체 변환 후 리턴
 
     _this.api = new api_1.NewsFeedApi('GET', config_1.URL_ADDR, false); // NewsFeedApi class instance
     // 최초 접근의 경우
 
     if (_this.feeds.length === 0) {
-      _this.feeds = store.feeds = _this.api.getData();
+      _this.feeds = window.store.feeds = _this.api.getData();
 
       _this.makeFeeds();
     }
@@ -550,9 +550,9 @@ function (_super) {
 
   NewsFeedView.prototype.render = function () {
     // 디폴트 페이징 예외 처리
-    store.currentPage = Number(location.hash.substr(7) || 1);
+    window.store.currentPage = Number(location.hash.substr(7) || 1);
 
-    for (var i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
+    for (var i = (window.store.currentPage - 1) * 10; i < window.store.currentPage * 10; i++) {
       var _a = this.feeds[i],
           read = _a.read,
           id = _a.id,
@@ -566,9 +566,9 @@ function (_super) {
 
     this.setTemplateData('news_feed', this.getHtml()); // template replace - news list content
 
-    this.setTemplateData('prev_page', String(store.currentPage > 1 ? store.currentPage - 1 : 1)); // prev page 
+    this.setTemplateData('prev_page', String(window.store.currentPage > 1 ? window.store.currentPage - 1 : 1)); // prev page 
 
-    this.setTemplateData('next_page', String(store.currentPage + 1)); // next page
+    this.setTemplateData('next_page', String(window.store.currentPage + 1)); // next page
 
     this.updateView();
   };
@@ -637,6 +637,7 @@ var store = {
   currentPage: 1,
   feeds: []
 };
+window.store = store;
 var router = new router_1.default();
 var newsFeedView = new page_1.NewsFeedView('root');
 var newsDetailView = new page_1.NewsDetailView('root');

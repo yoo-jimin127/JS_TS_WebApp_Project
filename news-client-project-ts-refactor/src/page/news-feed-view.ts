@@ -30,12 +30,12 @@ export default class NewsFeedView extends View {
     constructor(containerId: string) {
         super(containerId, template);
 
-        this.feeds = store.feeds; // json 데이터 객체 변환 후 리턴
+        this.feeds = window.store.feeds; // json 데이터 객체 변환 후 리턴
         this.api = new NewsFeedApi('GET', URL_ADDR, false); // NewsFeedApi class instance
     
         // 최초 접근의 경우
         if (this.feeds.length === 0) {
-            this.feeds = store.feeds = this.api.getData();
+            this.feeds = window.store.feeds = this.api.getData();
             this.makeFeeds();
         }
     }
@@ -43,9 +43,9 @@ export default class NewsFeedView extends View {
     /** 뉴스 목록 호출 함수 */
     public render(): void {
         // 디폴트 페이징 예외 처리
-        store.currentPage = Number(location.hash.substr(7) || 1);
+        window.store.currentPage = Number(location.hash.substr(7) || 1);
 
-        for (let i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
+        for (let i = (window.store.currentPage - 1) * 10; i < window.store.currentPage * 10; i++) {
             const {read, id, title, comments_count, user, points, time_ago} = this.feeds[i];
 
             this.addHtml(
@@ -73,8 +73,8 @@ export default class NewsFeedView extends View {
         }
 
         this.setTemplateData('news_feed', this.getHtml()); // template replace - news list content
-        this.setTemplateData('prev_page', String(store.currentPage > 1 ? store.currentPage - 1 : 1)); // prev page 
-        this.setTemplateData('next_page', String(store.currentPage + 1)); // next page
+        this.setTemplateData('prev_page', String(window.store.currentPage > 1 ? window.store.currentPage - 1 : 1)); // prev page 
+        this.setTemplateData('next_page', String(window.store.currentPage + 1)); // next page
         
         this.updateView();
     }
