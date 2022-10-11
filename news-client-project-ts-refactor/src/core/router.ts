@@ -1,4 +1,7 @@
-class Router {
+import { RouteInfo } from '../types';
+import View from './view';
+
+export default class Router {
     routeTable: RouteInfo[];
     defaultRoute : RouteInfo | null;
 

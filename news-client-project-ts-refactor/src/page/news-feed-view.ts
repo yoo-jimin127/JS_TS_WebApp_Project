@@ -1,9 +1,9 @@
-class NewsFeedView extends View {
-    private api: NewsFeedApi;
-    private feeds: NewsFeed[];
+import View from '../core/view';
+import { NewsFeedApi } from '../core/api';
+import { NewsFeed } from '../types';
+import { URL_ADDR } from '../config';
 
-    constructor(containerId: string) {
-        let template = `
+const template = `
         <div class="bg-gray-600 min-h-screen">
             <div class="bg-white text-xl">
                 <div class="mx-auto px-4">
@@ -22,10 +22,16 @@ class NewsFeedView extends View {
         </div>
         `;
 
+
+export default class NewsFeedView extends View {
+    private api: NewsFeedApi;
+    private feeds: NewsFeed[];
+
+    constructor(containerId: string) {
         super(containerId, template);
 
         this.feeds = store.feeds; // json 데이터 객체 변환 후 리턴
-        this.api = new NewsFeedApi(); // NewsFeedApi class instance
+        this.api = new NewsFeedApi('GET', URL_ADDR, false); // NewsFeedApi class instance
     
         // 최초 접근의 경우
         if (this.feeds.length === 0) {

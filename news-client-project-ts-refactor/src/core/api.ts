@@ -1,3 +1,5 @@
+import { NewsFeed, NewsDetail } from '../types';
+
 export class Api {
     ajax: XMLHttpRequest;
     url: string;

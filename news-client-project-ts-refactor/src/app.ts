@@ -1,3 +1,7 @@
+import Router from "./core/router";
+import { NewsFeedView, NewsDetailView} from './page';
+import { Store } from './types';
+
 const store: Store  = {
     currentPage: 1,
     feeds: [],

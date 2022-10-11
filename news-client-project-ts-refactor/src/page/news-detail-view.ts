@@ -1,6 +1,9 @@
-class NewsDetailView extends View {
-    constructor(containerId: string) {    
-        let template = `
+import View from '../core/view';
+import { NewsDetailApi } from '../core/api';
+import { NewsDetail, NewsComment } from '../types';
+import { CONTENT_URL } from '../config';
+
+const template = `
         <div class="bg-gray-600 min-h-screen pb-8">
             <div class="bg-white text-xl">
                 <div class="mx-auto px-4">
@@ -28,6 +31,9 @@ class NewsDetailView extends View {
         </div>
         `;
 
+export default class NewsDetailView extends View {
+    constructor(containerId: string) {    
+
         super(containerId, template);
     }
 
@@ -36,7 +42,7 @@ class NewsDetailView extends View {
         console.log(location.hash); // location 객체의 hash 값 확인 #3029303929 와 같은 방식으로 값 반환
 
         const id = location.hash.substr(7); // # 이후의 내용 저장
-        const api = new NewsDetailApi(); // class instance 생성
+        const api = new NewsDetailApi('GET', CONTENT_URL, false); // class instance 생성
         const newsDetail: NewsDetail = api.getData(id);
 
         // 피드 방문 처리
@@ -86,7 +92,7 @@ function getNewsDetail(): void {
     console.log(location.hash); // location 객체의 hash 값 확인 #3029303929 와 같은 방식으로 값 반환
 
     const id = location.hash.substr(7); // # 이후의 내용 저장
-    const api = new NewsDetailApi(); // class instance 생성
+    const api = new NewsDetailApi('GET', CONTENT_URL, false); // class instance 생성
     const newsContent = api.getData(id);
     
     let template = `
