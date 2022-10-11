@@ -19,15 +19,15 @@ export class Api {
     }
 }
 
-export class NewsFeedApi {
+export class NewsFeedApi extends Api {
     getData(): NewsFeed[] {
-        return this.getRequest<NewsFeed[]>( 'GET', URL_ADDR, false);
+        return this.getRequest<NewsFeed[]>();
     }
 }
 
-export class NewsDetailApi {
+export class NewsDetailApi extends Api {
     getData(id: string): NewsDetail {
-        return this.getRequest<NewsDetail>('GET', CONTENT_URL.replace('@id', id), false);
+        return this.getRequest<NewsDetail>();
     }
 }
 
