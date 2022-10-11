@@ -181,7 +181,7 @@ exports.default = Router;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-/** 공통 요소 클래스 */
+/** view - 공통 요소 */
 
 var View =
 /** @class */
@@ -235,6 +235,15 @@ function () {
 }();
 
 exports.default = View;
+},{}],"src/config.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.CONTENT_URL = exports.URL_ADDR = void 0;
+exports.URL_ADDR = 'https://api.hnpwa.com/v0/news/1.json';
+exports.CONTENT_URL = 'https://api.hnpwa.com/v0/item/@id.json'; // 해당 콘텐츠의 url
 },{}],"src/core/api.ts":[function(require,module,exports) {
 "use strict";
 
@@ -271,6 +280,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.NewsDetailApi = exports.NewsFeedApi = exports.Api = void 0;
 
+var config_1 = require("../config");
+
 var Api =
 /** @class */
 function () {
@@ -281,7 +292,7 @@ function () {
     this.async = async;
   }
 
-  Api.prototype.getRequest = function () {
+  Api.prototype.getRequest = function (method, url, async) {
     this.ajax.open(this.method, this.url, this.async);
     this.ajax.send();
     return JSON.parse(this.ajax.response);
@@ -302,7 +313,7 @@ function (_super) {
   }
 
   NewsFeedApi.prototype.getData = function () {
-    return this.getRequest();
+    return this.getRequest('GET', config_1.URL_ADDR, false);
   };
 
   return NewsFeedApi;
@@ -320,7 +331,7 @@ function (_super) {
   }
 
   NewsDetailApi.prototype.getData = function (id) {
-    return this.getRequest();
+    return this.getRequest('GET', config_1.CONTENT_URL, false);
   };
 
   return NewsDetailApi;
@@ -342,16 +353,7 @@ exports.NewsDetailApi = NewsDetailApi; // // mixin
 // interface NewsDetailApi extends Api{};
 // applyApiMixins(NewsFeedApi, [Api]);
 // applyApiMixins(NewsDetailApi, [Api]);
-},{}],"src/config.ts":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.CONTENT_URL = exports.URL_ADDR = void 0;
-exports.URL_ADDR = 'https://api.hnpwa.com/v0/news/1.json';
-exports.CONTENT_URL = 'https://api.hnpwa.com/v0/item/@id.json'; // 해당 콘텐츠의 url
-},{}],"src/page/news-detail-view.ts":[function(require,module,exports) {
+},{"../config":"src/config.ts"}],"src/page/news-detail-view.ts":[function(require,module,exports) {
 "use strict";
 
 var __extends = this && this.__extends || function () {

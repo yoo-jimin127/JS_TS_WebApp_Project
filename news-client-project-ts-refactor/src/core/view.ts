@@ -1,4 +1,4 @@
-/** 공통 요소 클래스 */
+/** view - 공통 요소 */
 export default abstract class View {
     private template: string;
     private renderTemplate: string;
