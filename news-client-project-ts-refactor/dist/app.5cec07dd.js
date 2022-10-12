@@ -274,15 +274,13 @@ exports.NewsDetailApi = exports.NewsFeedApi = void 0;
 var Api =
 /** @class */
 function () {
-  function Api(method, url, async) {
+  function Api(url) {
     this.ajax = new XMLHttpRequest();
     this.url = url;
-    this.method = method;
-    this.async = async;
   }
 
   Api.prototype.getRequest = function () {
-    this.ajax.open(this.method, this.url, this.async);
+    this.ajax.open('GET', this.url, false);
     this.ajax.send();
     return JSON.parse(this.ajax.response);
   };
@@ -297,8 +295,8 @@ var NewsFeedApi =
 function (_super) {
   __extends(NewsFeedApi, _super);
 
-  function NewsFeedApi(method, url, async) {
-    return _super.call(this, method, url, async) || this;
+  function NewsFeedApi(url) {
+    return _super.call(this, url) || this;
   }
 
   NewsFeedApi.prototype.getData = function () {
@@ -315,8 +313,8 @@ var NewsDetailApi =
 function (_super) {
   __extends(NewsDetailApi, _super);
 
-  function NewsDetailApi(method, url, async) {
-    return _super.call(this, method, url, async) || this;
+  function NewsDetailApi(url) {
+    return _super.call(this, url) || this;
   }
 
   NewsDetailApi.prototype.getData = function () {
