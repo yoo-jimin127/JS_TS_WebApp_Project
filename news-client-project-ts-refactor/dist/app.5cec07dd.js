@@ -235,15 +235,6 @@ function () {
 }();
 
 exports.default = View;
-},{}],"src/config.ts":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.CONTENT_URL = exports.URL_ADDR = void 0;
-exports.URL_ADDR = 'https://api.hnpwa.com/v0/news/1.json';
-exports.CONTENT_URL = 'https://api.hnpwa.com/v0/item/@id.json'; // 해당 콘텐츠의 url
 },{}],"src/core/api.ts":[function(require,module,exports) {
 "use strict";
 
@@ -278,9 +269,7 @@ var __extends = this && this.__extends || function () {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.NewsDetailApi = exports.NewsFeedApi = exports.Api = void 0;
-
-var config_1 = require("../config");
+exports.NewsDetailApi = exports.NewsFeedApi = void 0;
 
 var Api =
 /** @class */
@@ -292,7 +281,7 @@ function () {
     this.async = async;
   }
 
-  Api.prototype.getRequest = function (method, url, async) {
+  Api.prototype.getRequest = function () {
     this.ajax.open(this.method, this.url, this.async);
     this.ajax.send();
     return JSON.parse(this.ajax.response);
@@ -301,7 +290,7 @@ function () {
   return Api;
 }();
 
-exports.Api = Api;
+exports.default = Api;
 
 var NewsFeedApi =
 /** @class */
@@ -313,7 +302,7 @@ function (_super) {
   }
 
   NewsFeedApi.prototype.getData = function () {
-    return this.getRequest('GET', config_1.URL_ADDR, false);
+    return this.getRequest();
   };
 
   return NewsFeedApi;
@@ -331,7 +320,7 @@ function (_super) {
   }
 
   NewsDetailApi.prototype.getData = function (id) {
-    return this.getRequest('GET', config_1.CONTENT_URL, false);
+    return this.getRequest();
   };
 
   return NewsDetailApi;
@@ -353,7 +342,16 @@ exports.NewsDetailApi = NewsDetailApi; // // mixin
 // interface NewsDetailApi extends Api{};
 // applyApiMixins(NewsFeedApi, [Api]);
 // applyApiMixins(NewsDetailApi, [Api]);
-},{"../config":"src/config.ts"}],"src/page/news-detail-view.ts":[function(require,module,exports) {
+},{}],"src/config.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.CONTENT_URL = exports.URL_ADDR = void 0;
+exports.URL_ADDR = 'https://api.hnpwa.com/v0/news/1.json';
+exports.CONTENT_URL = 'https://api.hnpwa.com/v0/item/@id.json'; // 해당 콘텐츠의 url
+},{}],"src/page/news-detail-view.ts":[function(require,module,exports) {
 "use strict";
 
 var __extends = this && this.__extends || function () {
@@ -400,7 +398,7 @@ var api_1 = require("../core/api");
 
 var config_1 = require("../config");
 
-var template = "\n        <div class=\"bg-gray-600 min-h-screen pb-8\">\n            <div class=\"bg-white text-xl\">\n                <div class=\"mx-auto px-4\">\n                    <div class=\"flex justify-between tiems-center py-6\">\n                        <div class=\"flex justify-start\">\n                            <h1 class=\"font-extrabold\">Hacker News</h1>\n                        </div>\n                        <div class=\"items-center justify-end\">\n                            <a href=\"#/page/{{__currentPage__}}\" class=\"text-gray-500\">\n                                <i class=\"fa fa-times\"></i>\n                            </a>\n                        </div>\n                    </div>\n                </div>\n            </div>\n\n            <div class=\"h-full border rounded-xl bg-white m-6 p-4\">\n                <h2>{{__title__}}</h2>\n                <div class=\"text-gray-400 h-20\">\n                    {{__content__}}\n                </div>\n\n                {{__comments__}}\n            </div>\n        </div>\n        ";
+var template = "\n        <div class=\"bg-gray-600 min-h-screen pb-8\">\n            <div class=\"bg-white text-xl\">\n                <div class=\"mx-auto px-4\">\n                    <div class=\"flex justify-between tiems-center py-6\">\n                        <div class=\"flex justify-start\">\n                            <h1 class=\"font-extrabold\">Hacker News</h1>\n                        </div>\n                        <div class=\"items-center justify-end\">\n                            <a href=\"#/page/{{__currentPage__}}\" class=\"text-gray-500\">\n                                <i class=\"fa fa-times\"></i>\n                            </a>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"h-full border rounded-xl bg-white m-6 p-4\">\n                <h2>{{__title__}}</h2>\n                <div class=\"text-gray-400 h-20\">\n                    {{__content__}}\n                </div>\n                {{__comments__}}\n            </div>\n        </div>\n        ";
 
 var NewsDetailView =
 /** @class */
@@ -411,13 +409,12 @@ function (_super) {
     return _super.call(this, containerId, template) || this;
   }
 
-  NewsDetailView.prototype.render = function () {
+  NewsDetailView.prototype.render = function (id) {
     console.log('hash changed');
     console.log(location.hash); // location 객체의 hash 값 확인 #3029303929 와 같은 방식으로 값 반환
+    // const id = location.hash.substr(7); // # 이후의 내용 저장
 
-    var id = location.hash.substr(7); // # 이후의 내용 저장
-
-    var api = new api_1.NewsDetailApi('GET', config_1.CONTENT_URL, false); // class instance 생성
+    var api = new api_1.NewsDetailApi('GET', config_1.CONTENT_URL.replace('@id', id), false); // class instance 생성
 
     var newsDetail = api.getData(id); // 피드 방문 처리
 
@@ -465,7 +462,7 @@ function getNewsDetail() {
   var api = new api_1.NewsDetailApi('GET', config_1.CONTENT_URL, false); // class instance 생성
 
   var newsContent = api.getData(id);
-  var template = "\n    <div class=\"bg-gray-600 min-h-screen pb-8\">\n        <div class=\"bg-white text-xl\">\n            <div class=\"mx-auto px-4\">\n                <div class=\"flex justify-between tiems-center py-6\">\n                    <div class=\"flex justify-start\">\n                        <h1 class=\"font-extrabold\">Hacker News</h1>\n                    </div>\n                    <div class=\"items-center justify-end\">\n                        <a href=\"#/page/".concat(window.store.currentPage, "\" class=\"text-gray-500\">\n                            <i class=\"fa fa-times\"></i>\n                        </a>\n                    </div>\n                </div>\n            </div>\n        </div>\n\n        <div class=\"h-full border rounded-xl bg-white m-6 p-4\">\n            <h2>").concat(newsContent.title, "</h2>\n            <div class=\"text-gray-400 h-20\">\n                ").concat(newsContent.content, "\n            </div>\n\n            {{__comments__}}\n        </div>\n    </div>\n    "); // 피드 방문 처리
+  var template = "\n    <div class=\"bg-gray-600 min-h-screen pb-8\">\n        <div class=\"bg-white text-xl\">\n            <div class=\"mx-auto px-4\">\n                <div class=\"flex justify-between tiems-center py-6\">\n                    <div class=\"flex justify-start\">\n                        <h1 class=\"font-extrabold\">Hacker News</h1>\n                    </div>\n                    <div class=\"items-center justify-end\">\n                        <a href=\"#/page/".concat(window.store.currentPage, "\" class=\"text-gray-500\">\n                            <i class=\"fa fa-times\"></i>\n                        </a>\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"h-full border rounded-xl bg-white m-6 p-4\">\n            <h2>").concat(newsContent.title, "</h2>\n            <div class=\"text-gray-400 h-20\">\n                ").concat(newsContent.content, "\n            </div>\n            {{__comments__}}\n        </div>\n    </div>\n    "); // 피드 방문 처리
 
   for (var i = 0; i < window.store.feeds.length; i++) {
     if (window.store.feeds[i].id === Number(id)) {
@@ -676,7 +673,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49742" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50481" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

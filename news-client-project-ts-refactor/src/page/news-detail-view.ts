@@ -19,13 +19,11 @@ const template = `
                     </div>
                 </div>
             </div>
-
             <div class="h-full border rounded-xl bg-white m-6 p-4">
                 <h2>{{__title__}}</h2>
                 <div class="text-gray-400 h-20">
                     {{__content__}}
                 </div>
-
                 {{__comments__}}
             </div>
         </div>
@@ -33,16 +31,15 @@ const template = `
 
 export default class NewsDetailView extends View {
     constructor(containerId: string) {    
-
         super(containerId, template);
     }
 
-    render(): void {
+    render(id: string): void {
         console.log('hash changed')
         console.log(location.hash); // location 객체의 hash 값 확인 #3029303929 와 같은 방식으로 값 반환
 
-        const id = location.hash.substr(7); // # 이후의 내용 저장
-        const api = new NewsDetailApi('GET', CONTENT_URL, false); // class instance 생성
+        // const id = location.hash.substr(7); // # 이후의 내용 저장
+        const api = new NewsDetailApi('GET', CONTENT_URL.replace('@id', id), false); // class instance 생성
         const newsDetail: NewsDetail = api.getData(id);
 
         // 피드 방문 처리
@@ -111,13 +108,11 @@ function getNewsDetail(): void {
                 </div>
             </div>
         </div>
-
         <div class="h-full border rounded-xl bg-white m-6 p-4">
             <h2>${newsContent.title}</h2>
             <div class="text-gray-400 h-20">
                 ${newsContent.content}
             </div>
-
             {{__comments__}}
         </div>
     </div>

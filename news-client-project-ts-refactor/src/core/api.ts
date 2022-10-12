@@ -1,7 +1,7 @@
 import { CONTENT_URL, URL_ADDR } from '../config';
 import { NewsFeed, NewsDetail } from '../types';
 
-export class Api {
+export default class Api {
     ajax: XMLHttpRequest;
     url: string;
     method: string;
@@ -14,23 +14,23 @@ export class Api {
         this.async = async;
     }
 
-    getRequest<AjaxResponse>(method: string, url: string, async: boolean): AjaxResponse {
+    getRequest<AjaxResponse>(): AjaxResponse {
         this.ajax.open(this.method, this.url, this.async);
         this.ajax.send();
     
-        return JSON.parse(this.ajax.response);
+        return JSON.parse(this.ajax.response) as AjaxResponse;
     }
 }
 
 export class NewsFeedApi extends Api {
     getData(): NewsFeed[] {
-        return this.getRequest<NewsFeed[]>('GET', URL_ADDR, false);
+        return this.getRequest<NewsFeed[]>();
     }
 }
 
 export class NewsDetailApi extends Api {
     getData(id: string): NewsDetail {
-        return this.getRequest<NewsDetail>('GET', CONTENT_URL, false);
+        return this.getRequest<NewsDetail>();
     }
 }
 

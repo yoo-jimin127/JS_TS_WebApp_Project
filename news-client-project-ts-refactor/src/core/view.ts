@@ -45,5 +45,5 @@ export default abstract class View {
         this.htmlList = [];
     }
 
-    abstract render(): void; // abstract method
+    abstract render(...params: string[]): void; // abstract method
 }
