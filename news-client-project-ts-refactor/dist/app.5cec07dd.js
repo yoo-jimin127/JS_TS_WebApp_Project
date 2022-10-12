@@ -297,8 +297,8 @@ var NewsFeedApi =
 function (_super) {
   __extends(NewsFeedApi, _super);
 
-  function NewsFeedApi() {
-    return _super !== null && _super.apply(this, arguments) || this;
+  function NewsFeedApi(method, url, async) {
+    return _super.call(this, method, url, async) || this;
   }
 
   NewsFeedApi.prototype.getData = function () {
@@ -315,11 +315,11 @@ var NewsDetailApi =
 function (_super) {
   __extends(NewsDetailApi, _super);
 
-  function NewsDetailApi() {
-    return _super !== null && _super.apply(this, arguments) || this;
+  function NewsDetailApi(method, url, async) {
+    return _super.call(this, method, url, async) || this;
   }
 
-  NewsDetailApi.prototype.getData = function (id) {
+  NewsDetailApi.prototype.getData = function () {
     return this.getRequest();
   };
 
@@ -412,11 +412,9 @@ function (_super) {
   NewsDetailView.prototype.render = function (id) {
     console.log('hash changed');
     console.log(location.hash); // location 객체의 hash 값 확인 #3029303929 와 같은 방식으로 값 반환
-    // const id = location.hash.substr(7); // # 이후의 내용 저장
 
     var api = new api_1.NewsDetailApi('GET', config_1.CONTENT_URL.replace('@id', id), false); // class instance 생성
-
-    var newsDetail = api.getData(id); // 피드 방문 처리
+    // 피드 방문 처리
 
     for (var i = 0; i < window.store.feeds.length; i++) {
       if (window.store.feeds[i].id === Number(id)) {
@@ -425,6 +423,7 @@ function (_super) {
       }
     }
 
+    var newsDetail = api.getData();
     this.setTemplateData('comments', this.makeComment(newsDetail.comments));
     this.setTemplateData('currentPage', String(window.store.currentPage));
     this.setTemplateData('title', newsDetail.title);
@@ -451,29 +450,6 @@ function (_super) {
 }(view_1.default);
 
 exports.default = NewsDetailView;
-/** 기사별 세부 페이지 함수 */
-
-function getNewsDetail() {
-  console.log('hash changed');
-  console.log(location.hash); // location 객체의 hash 값 확인 #3029303929 와 같은 방식으로 값 반환
-
-  var id = location.hash.substr(7); // # 이후의 내용 저장
-
-  var api = new api_1.NewsDetailApi('GET', config_1.CONTENT_URL, false); // class instance 생성
-
-  var newsContent = api.getData(id);
-  var template = "\n    <div class=\"bg-gray-600 min-h-screen pb-8\">\n        <div class=\"bg-white text-xl\">\n            <div class=\"mx-auto px-4\">\n                <div class=\"flex justify-between tiems-center py-6\">\n                    <div class=\"flex justify-start\">\n                        <h1 class=\"font-extrabold\">Hacker News</h1>\n                    </div>\n                    <div class=\"items-center justify-end\">\n                        <a href=\"#/page/".concat(window.store.currentPage, "\" class=\"text-gray-500\">\n                            <i class=\"fa fa-times\"></i>\n                        </a>\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"h-full border rounded-xl bg-white m-6 p-4\">\n            <h2>").concat(newsContent.title, "</h2>\n            <div class=\"text-gray-400 h-20\">\n                ").concat(newsContent.content, "\n            </div>\n            {{__comments__}}\n        </div>\n    </div>\n    "); // 피드 방문 처리
-
-  for (var i = 0; i < window.store.feeds.length; i++) {
-    if (window.store.feeds[i].id === Number(id)) {
-      window.store.feeds[i].read = true;
-      break;
-    }
-  }
-
-  this.getHtml('comments', this.makeComment(newsContent.comments));
-  this.updateView();
-}
 },{"../core/view":"src/core/view.ts","../core/api":"src/core/api.ts","../config":"src/config.ts"}],"src/page/news-feed-view.ts":[function(require,module,exports) {
 "use strict";
 
@@ -673,7 +649,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50481" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51054" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

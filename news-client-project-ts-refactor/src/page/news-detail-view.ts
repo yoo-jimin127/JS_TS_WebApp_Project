@@ -38,9 +38,7 @@ export default class NewsDetailView extends View {
         console.log('hash changed')
         console.log(location.hash); // location 객체의 hash 값 확인 #3029303929 와 같은 방식으로 값 반환
 
-        // const id = location.hash.substr(7); // # 이후의 내용 저장
         const api = new NewsDetailApi('GET', CONTENT_URL.replace('@id', id), false); // class instance 생성
-        const newsDetail: NewsDetail = api.getData(id);
 
         // 피드 방문 처리
         for (let i = 0; i < window.store.feeds.length; i++) {
@@ -49,7 +47,9 @@ export default class NewsDetailView extends View {
                 break;
             }
         }
-            
+
+        const newsDetail: NewsDetail = api.getData();
+
         this.setTemplateData('comments', this.makeComment(newsDetail.comments));
         this.setTemplateData('currentPage', String(window.store.currentPage));
         this.setTemplateData('title', newsDetail.title);
@@ -59,7 +59,7 @@ export default class NewsDetailView extends View {
     }
 
     /** 댓글 및 대댓글 생성 함수 */
-    makeComment(comments: NewsComment[]): string {
+    private makeComment(comments: NewsComment[]): string {
         for (let i = 0; i < comments.length; i++) {
             const comment: NewsComment = comments[i];
 
@@ -81,51 +81,4 @@ export default class NewsDetailView extends View {
 
         return this.getHtml();
     }
-}
-
-/** 기사별 세부 페이지 함수 */
-function getNewsDetail(): void {
-    console.log('hash changed')
-    console.log(location.hash); // location 객체의 hash 값 확인 #3029303929 와 같은 방식으로 값 반환
-
-    const id = location.hash.substr(7); // # 이후의 내용 저장
-    const api = new NewsDetailApi('GET', CONTENT_URL, false); // class instance 생성
-    const newsContent = api.getData(id);
-    
-    let template = `
-    <div class="bg-gray-600 min-h-screen pb-8">
-        <div class="bg-white text-xl">
-            <div class="mx-auto px-4">
-                <div class="flex justify-between tiems-center py-6">
-                    <div class="flex justify-start">
-                        <h1 class="font-extrabold">Hacker News</h1>
-                    </div>
-                    <div class="items-center justify-end">
-                        <a href="#/page/${window.store.currentPage}" class="text-gray-500">
-                            <i class="fa fa-times"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="h-full border rounded-xl bg-white m-6 p-4">
-            <h2>${newsContent.title}</h2>
-            <div class="text-gray-400 h-20">
-                ${newsContent.content}
-            </div>
-            {{__comments__}}
-        </div>
-    </div>
-    `;
-
-    // 피드 방문 처리
-    for (let i = 0; i < window.store.feeds.length; i++) {
-        if (window.store.feeds[i].id === Number(id)) {
-            window.store.feeds[i].read = true;
-            break;
-        }
-    }
-    
-    this.getHtml('comments', this.makeComment(newsContent.comments));
-    this.updateView();
 }

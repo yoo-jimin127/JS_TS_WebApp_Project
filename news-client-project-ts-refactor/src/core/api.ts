@@ -23,13 +23,20 @@ export default class Api {
 }
 
 export class NewsFeedApi extends Api {
+    constructor(method: string, url: string, async: boolean) {
+        super(method, url, async);
+    }
     getData(): NewsFeed[] {
         return this.getRequest<NewsFeed[]>();
     }
 }
 
 export class NewsDetailApi extends Api {
-    getData(id: string): NewsDetail {
+    constructor(method: string, url: string, async: boolean) {
+        super(method, url, async);
+    }
+
+    getData(): NewsDetail {
         return this.getRequest<NewsDetail>();
     }
 }
