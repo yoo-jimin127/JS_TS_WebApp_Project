@@ -50,10 +50,10 @@ export default class NewsDetailView extends View {
 
         const newsDetail: NewsDetail = api.getData();
 
-        this.setTemplateData('comments', this.makeComment(newsDetail.comments));
-        this.setTemplateData('currentPage', String(window.store.currentPage));
+        this.setTemplateData('currentPage', window.store.currentPage.toString());
         this.setTemplateData('title', newsDetail.title);
         this.setTemplateData('content', newsDetail.content);
+        this.setTemplateData('comments', this.makeComment(newsDetail.comments));
 
         this.updateView();
     }
@@ -74,7 +74,7 @@ export default class NewsDetailView extends View {
             `);
         
             // 대댓글 처리
-            if (comments[i].comments.length > 0) {
+            if (comment.comments.length > 0) {
                 this.addHtml(this.makeComment(comment.comments));
             }
         }

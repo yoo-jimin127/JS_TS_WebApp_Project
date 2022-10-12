@@ -424,10 +424,10 @@ function (_super) {
     }
 
     var newsDetail = api.getData();
-    this.setTemplateData('comments', this.makeComment(newsDetail.comments));
-    this.setTemplateData('currentPage', String(window.store.currentPage));
+    this.setTemplateData('currentPage', window.store.currentPage.toString());
     this.setTemplateData('title', newsDetail.title);
     this.setTemplateData('content', newsDetail.content);
+    this.setTemplateData('comments', this.makeComment(newsDetail.comments));
     this.updateView();
   };
   /** 댓글 및 대댓글 생성 함수 */
@@ -438,7 +438,7 @@ function (_super) {
       var comment = comments[i];
       this.addHtml("\n                <div style=\"padding-left: ".concat(comment.level * 40, "px;\" class=\"mt-4\">\n                    <div class=\"text-gray-400\">\n                        <i class=\"fa fa-sort-up mr-2\"></i>\n                        <strong>").concat(comment.user, "</strong> ").concat(comment.time_ago, "\n                    </div>\n                    <p class=\"text-gray-700\">").concat(comment.content, "</p>\n                </div>\n            ")); // 대댓글 처리
 
-      if (comments[i].comments.length > 0) {
+      if (comment.comments.length > 0) {
         this.addHtml(this.makeComment(comment.comments));
       }
     }
@@ -523,9 +523,13 @@ function (_super) {
   /** 뉴스 목록 호출 함수 */
 
 
-  NewsFeedView.prototype.render = function () {
-    // 디폴트 페이징 예외 처리
-    window.store.currentPage = Number(location.hash.substr(7) || 1);
+  NewsFeedView.prototype.render = function (page) {
+    if (page === void 0) {
+      page = '1';
+    } // 디폴트 페이징 예외 처리
+
+
+    window.store.currentPage = Number(page); //window.store.currentPage = Number(location.hash.substr(7) || 1);
 
     for (var i = (window.store.currentPage - 1) * 10; i < window.store.currentPage * 10; i++) {
       var _a = this.feeds[i],
@@ -649,7 +653,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51054" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51112" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
