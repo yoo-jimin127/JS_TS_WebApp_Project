@@ -396,7 +396,7 @@ var api_1 = require("../core/api");
 
 var config_1 = require("../config");
 
-var template = "\n        <div class=\"bg-gray-600 min-h-screen pb-8\">\n            <div class=\"bg-white text-xl\">\n                <div class=\"mx-auto px-4\">\n                    <div class=\"flex justify-between tiems-center py-6\">\n                        <div class=\"flex justify-start\">\n                            <h1 class=\"font-extrabold\">Hacker News</h1>\n                        </div>\n                        <div class=\"items-center justify-end\">\n                            <a href=\"#/page/{{__currentPage__}}\" class=\"text-gray-500\">\n                                <i class=\"fa fa-times\"></i>\n                            </a>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"h-full border rounded-xl bg-white m-6 p-4\">\n                <h2>{{__title__}}</h2>\n                <div class=\"text-gray-400 h-20\">\n                    {{__content__}}\n                </div>\n                {{__comments__}}\n            </div>\n        </div>\n        ";
+var template = "\n    <div class=\"bg-gray-600 min-h-screen pb-8\">\n        <div class=\"bg-white text-xl\">\n            <div class=\"mx-auto px-4\">\n                <div class=\"flex justify-between tiems-center py-6\">\n                    <div class=\"flex justify-start\">\n                        <h1 class=\"font-extrabold\">Hacker News</h1>\n                    </div>\n                    <div class=\"items-center justify-end\">\n                        <a href=\"#/page/{{__currentPage__}}\" class=\"text-gray-500\">\n                            <i class=\"fa fa-times\"></i>\n                        </a>\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"h-full border rounded-xl bg-white m-6 p-4\">\n            <h2>{{__title__}}</h2>\n            <div class=\"text-gray-400 h-20\">\n                {{__content__}}\n            </div>\n            {{__comments__}}\n        </div>\n    </div>\n    ";
 
 var NewsDetailView =
 /** @class */
@@ -404,37 +404,40 @@ function (_super) {
   __extends(NewsDetailView, _super);
 
   function NewsDetailView(containerId) {
-    return _super.call(this, containerId, template) || this;
-  }
+    var _this = _super.call(this, containerId, template) || this;
 
-  NewsDetailView.prototype.render = function (id) {
-    console.log('hash changed');
-    console.log(location.hash); // location 객체의 hash 값 확인 #3029303929 와 같은 방식으로 값 반환
+    _this.render = function (id) {
+      var api = new api_1.NewsDetailApi(config_1.CONTENT_URL.replace('@id', id)); // 피드 방문 처리
 
-    var api = new api_1.NewsDetailApi('GET', config_1.CONTENT_URL.replace('@id', id), false); // class instance 생성
-    // 피드 방문 처리
-
-    for (var i = 0; i < window.store.feeds.length; i++) {
-      if (window.store.feeds[i].id === Number(id)) {
-        window.store.feeds[i].read = true;
-        break;
+      for (var i = 0; i < window.store.feeds.length; i++) {
+        if (window.store.feeds[i].id === Number(id)) {
+          window.store.feeds[i].read = true;
+          break;
+        }
       }
-    }
 
-    var newsDetail = api.getData();
-    this.setTemplateData('currentPage', window.store.currentPage.toString());
-    this.setTemplateData('title', newsDetail.title);
-    this.setTemplateData('content', newsDetail.content);
-    this.setTemplateData('comments', this.makeComment(newsDetail.comments));
-    this.updateView();
-  };
+      var newsDetail = api.getData();
+
+      _this.setTemplateData('currentPage', window.store.currentPage.toString());
+
+      _this.setTemplateData('title', newsDetail.title);
+
+      _this.setTemplateData('content', newsDetail.content);
+
+      _this.setTemplateData('comments', _this.makeComment(newsDetail.comments));
+
+      _this.updateView();
+    };
+
+    return _this;
+  }
   /** 댓글 및 대댓글 생성 함수 */
 
 
   NewsDetailView.prototype.makeComment = function (comments) {
     for (var i = 0; i < comments.length; i++) {
       var comment = comments[i];
-      this.addHtml("\n                <div style=\"padding-left: ".concat(comment.level * 40, "px;\" class=\"mt-4\">\n                    <div class=\"text-gray-400\">\n                        <i class=\"fa fa-sort-up mr-2\"></i>\n                        <strong>").concat(comment.user, "</strong> ").concat(comment.time_ago, "\n                    </div>\n                    <p class=\"text-gray-700\">").concat(comment.content, "</p>\n                </div>\n            ")); // 대댓글 처리
+      this.addHtml("\n              <div style=\"padding-left: ".concat(comment.level * 40, "px;\" class=\"mt-4\">\n                <div class=\"text-gray-400\">\n                    <i class=\"fa fa-sort-up mr-2\"></i>\n                    <strong>").concat(comment.user, "</strong> ").concat(comment.time_ago, "\n                </div>\n                <p class=\"text-gray-700\">").concat(comment.content, "</p>\n                </div>      \n            ")); // 대댓글 처리
 
       if (comment.comments.length > 0) {
         this.addHtml(this.makeComment(comment.comments));
@@ -507,7 +510,7 @@ function (_super) {
 
     _this.feeds = window.store.feeds; // json 데이터 객체 변환 후 리턴
 
-    _this.api = new api_1.NewsFeedApi('GET', config_1.URL_ADDR, false); // NewsFeedApi class instance
+    _this.api = new api_1.NewsFeedApi(config_1.URL_ADDR); // NewsFeedApi class instance
     // 최초 접근의 경우
 
     if (_this.feeds.length === 0) {
@@ -651,7 +654,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51112" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51136" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

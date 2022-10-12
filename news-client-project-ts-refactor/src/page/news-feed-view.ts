@@ -31,7 +31,7 @@ export default class NewsFeedView extends View {
         super(containerId, template);
 
         this.feeds = window.store.feeds; // json 데이터 객체 변환 후 리턴
-        this.api = new NewsFeedApi('GET', URL_ADDR, false); // NewsFeedApi class instance
+        this.api = new NewsFeedApi(URL_ADDR); // NewsFeedApi class instance
     
         // 최초 접근의 경우
         if (this.feeds.length === 0) {
