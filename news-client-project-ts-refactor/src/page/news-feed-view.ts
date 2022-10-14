@@ -1,6 +1,6 @@
 import View from '../core/view';
 import { NewsFeedApi } from '../core/api';
-import { NewsFeed, NewsStore } from '../types';
+import { NewsStore } from '../types';
 import { URL_ADDR } from '../config';
 
 const template = `
@@ -25,7 +25,6 @@ const template = `
 
 export default class NewsFeedView extends View {
     private api: NewsFeedApi;
-    private feeds: NewsFeed[];
     private store: NewsStore;
 
     constructor(containerId: string, store: NewsStore) {
@@ -41,9 +40,9 @@ export default class NewsFeedView extends View {
     }
 
     /** 뉴스 목록 호출 함수 */
-    render(): void {
+    render = (page: string = '1'): void => {
         // 디폴트 페이징 예외 처리
-        this.store.currentPage = Number(location.hash.substr(7) || 1);
+        this.store.currentPage = Number(page);
 
         for (let i = (this.store.currentPage - 1) * 10; i < this.store.currentPage * 10; i++) {
             const {read, id, title, comments_count, user, points, time_ago} = this.store.getFeed(i);
@@ -77,12 +76,5 @@ export default class NewsFeedView extends View {
         this.setTemplateData('next_page', String(this.store.nextPage)); // next page
         
         this.updateView();
-    }
-
-    /** 방문 페이지 상태 관리 함수 */
-    private makeFeeds(): void {
-        for (let i = 0; i < this.feeds.length; i++) {
-            this.feeds[i].read = false;
-        }
     }
 }

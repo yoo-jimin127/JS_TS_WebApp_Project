@@ -535,6 +535,41 @@ function (_super) {
 
   function NewsFeedView(containerId, store) {
     var _this = _super.call(this, containerId, template) || this;
+    /** 뉴스 목록 호출 함수 */
+
+
+    _this.render = function (page) {
+      if (page === void 0) {
+        page = '1';
+      } // 디폴트 페이징 예외 처리
+
+
+      _this.store.currentPage = Number(page);
+
+      for (var i = (_this.store.currentPage - 1) * 10; i < _this.store.currentPage * 10; i++) {
+        var _a = _this.store.getFeed(i),
+            read = _a.read,
+            id = _a.id,
+            title = _a.title,
+            comments_count = _a.comments_count,
+            user = _a.user,
+            points = _a.points,
+            time_ago = _a.time_ago;
+
+        _this.addHtml("\n            <div class=\"p-6 ".concat(read ? 'bg-gray-400' : 'bg-white', " mt-6 rounded-lg shadow-md transition-colors duration-500 hover:bg-green-100\">\n                <div class=\"flex\">\n                    <div class=\"flex-auto\">\n                        <a href=\"#/show/").concat(id, "\">").concat(title, "</a>\n                    </div>\n                    <div class=\"text-center text-sm\">\n                    <div class=\"w-10 text-white bg-green-300 rounded-lg px-0 py-2\">\n                            ").concat(comments_count, "\n                        </div>\n                    </div>\n                </div>\n                <div class=\"flex mt-3\">\n                    <div class=\"grid gird-cols-3 text-sm text-gray-500\">\n                        <div><i class=\"fas fa-user mr-1\"></i>").concat(user, "</div>\n                        <div><i class=\"fas fa-heart mr-1\"></i>").concat(points, "</div>\n                        <div><i class=\"far fa-clock mr-1\"></i>").concat(time_ago, "</div>\n                    </div>\n                </div>\n            </div>\n            "));
+      }
+
+      _this.setTemplateData('news_feed', _this.getHtml()); // template replace - news list content
+
+
+      _this.setTemplateData('prev_page', String(_this.store.prevPage)); // prev page 
+
+
+      _this.setTemplateData('next_page', String(_this.store.nextPage)); // next page
+
+
+      _this.updateView();
+    };
 
     _this.store = store;
     _this.api = new api_1.NewsFeedApi(config_1.URL_ADDR); // NewsFeedApi class instance
@@ -546,42 +581,6 @@ function (_super) {
 
     return _this;
   }
-  /** 뉴스 목록 호출 함수 */
-
-
-  NewsFeedView.prototype.render = function () {
-    // 디폴트 페이징 예외 처리
-    this.store.currentPage = Number(location.hash.substr(7) || 1);
-
-    for (var i = (this.store.currentPage - 1) * 10; i < this.store.currentPage * 10; i++) {
-      var _a = this.store.getFeed(i),
-          read = _a.read,
-          id = _a.id,
-          title = _a.title,
-          comments_count = _a.comments_count,
-          user = _a.user,
-          points = _a.points,
-          time_ago = _a.time_ago;
-
-      this.addHtml("\n            <div class=\"p-6 ".concat(read ? 'bg-gray-400' : 'bg-white', " mt-6 rounded-lg shadow-md transition-colors duration-500 hover:bg-green-100\">\n                <div class=\"flex\">\n                    <div class=\"flex-auto\">\n                        <a href=\"#/show/").concat(id, "\">").concat(title, "</a>\n                    </div>\n                    <div class=\"text-center text-sm\">\n                    <div class=\"w-10 text-white bg-green-300 rounded-lg px-0 py-2\">\n                            ").concat(comments_count, "\n                        </div>\n                    </div>\n                </div>\n                <div class=\"flex mt-3\">\n                    <div class=\"grid gird-cols-3 text-sm text-gray-500\">\n                        <div><i class=\"fas fa-user mr-1\"></i>").concat(user, "</div>\n                        <div><i class=\"fas fa-heart mr-1\"></i>").concat(points, "</div>\n                        <div><i class=\"far fa-clock mr-1\"></i>").concat(time_ago, "</div>\n                    </div>\n                </div>\n            </div>\n            "));
-    }
-
-    this.setTemplateData('news_feed', this.getHtml()); // template replace - news list content
-
-    this.setTemplateData('prev_page', String(this.store.prevPage)); // prev page 
-
-    this.setTemplateData('next_page', String(this.store.nextPage)); // next page
-
-    this.updateView();
-  };
-  /** 방문 페이지 상태 관리 함수 */
-
-
-  NewsFeedView.prototype.makeFeeds = function () {
-    for (var i = 0; i < this.feeds.length; i++) {
-      this.feeds[i].read = false;
-    }
-  };
 
   return NewsFeedView;
 }(view_1.default);
@@ -775,7 +774,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54398" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56029" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
