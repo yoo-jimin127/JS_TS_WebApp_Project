@@ -524,13 +524,9 @@ function (_super) {
   /** 뉴스 목록 호출 함수 */
 
 
-  NewsFeedView.prototype.render = function (page) {
-    if (page === void 0) {
-      page = '1';
-    } // 디폴트 페이징 예외 처리
-
-
-    window.store.currentPage = Number(page); //window.store.currentPage = Number(location.hash.substr(7) || 1);
+  NewsFeedView.prototype.render = function () {
+    // 디폴트 페이징 예외 처리
+    window.store.currentPage = Number(location.hash.substr(7) || 1);
 
     for (var i = (window.store.currentPage - 1) * 10; i < window.store.currentPage * 10; i++) {
       var _a = this.feeds[i],

@@ -41,10 +41,9 @@ export default class NewsFeedView extends View {
     }
 
     /** 뉴스 목록 호출 함수 */
-    render(page: string = '1'): void {
+    render(): void {
         // 디폴트 페이징 예외 처리
-        window.store.currentPage = Number(page);
-        //window.store.currentPage = Number(location.hash.substr(7) || 1);
+        window.store.currentPage = Number(location.hash.substr(7) || 1);
 
         for (let i = (window.store.currentPage - 1) * 10; i < window.store.currentPage * 10; i++) {
             const {read, id, title, comments_count, user, points, time_ago} = this.feeds[i];
