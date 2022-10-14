@@ -593,7 +593,108 @@ Object.defineProperty(exports, "NewsFeedView", {
     return __importDefault(news_feed_view_1).default;
   }
 });
-},{"./news-detail-view":"src/page/news-detail-view.ts","./news-feed-view":"src/page/news-feed-view.ts"}],"src/app.ts":[function(require,module,exports) {
+},{"./news-detail-view":"src/page/news-detail-view.ts","./news-feed-view":"src/page/news-feed-view.ts"}],"src/store.ts":[function(require,module,exports) {
+"use strict";
+
+var __assign = this && this.__assign || function () {
+  __assign = Object.assign || function (t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+      s = arguments[i];
+
+      for (var p in s) {
+        if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+      }
+    }
+
+    return t;
+  };
+
+  return __assign.apply(this, arguments);
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Store =
+/** @class */
+function () {
+  function Store() {
+    this.feeds = [];
+    this._currentPage = 1;
+  }
+
+  Object.defineProperty(Store.prototype, "currentPage", {
+    // getter setter 설정
+    get: function get() {
+      return this._currentPage;
+    },
+    set: function set(page) {
+      this._currentPage = page;
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(Store.prototype, "nextPage", {
+    get: function get() {
+      return this._currentPage + 1;
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(Store.prototype, "prevPage", {
+    get: function get() {
+      return this._currentPage > 1 ? this._currentPage - 1 : 1;
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(Store.prototype, "numberOfFeed", {
+    get: function get() {
+      return this.feeds.length;
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(Store.prototype, "hasFeeds", {
+    get: function get() {
+      return this.feeds.length > 0;
+    },
+    enumerable: false,
+    configurable: true
+  }); // 메소드 정의부
+
+  Store.prototype.getAllFeeds = function () {
+    return this.feeds;
+  };
+
+  Store.prototype.getFeeds = function (position) {
+    return this.feeds[position];
+  };
+
+  Store.prototype.setFeeds = function (feeds) {
+    feeds.map(function (feed) {
+      return __assign(__assign({}, feed), {
+        read: false
+      });
+    });
+  };
+
+  Store.prototype.makeRead = function (id) {
+    var feed = this.feeds.find(function (feed) {
+      return feed.id === id;
+    });
+
+    if (feed) {
+      feed.read = true;
+    }
+  };
+
+  return Store;
+}();
+
+exports.default = Store;
+},{}],"src/app.ts":[function(require,module,exports) {
 "use strict";
 
 var __importDefault = this && this.__importDefault || function (mod) {
@@ -610,15 +711,18 @@ var router_1 = __importDefault(require("./core/router"));
 
 var page_1 = require("./page");
 
+var store_1 = __importDefault(require("./store"));
+
+var store = new store_1.default();
 var router = new router_1.default();
-var newsFeedView = new page_1.NewsFeedView('root');
-var newsDetailView = new page_1.NewsDetailView('root');
+var newsFeedView = new page_1.NewsFeedView('root', store);
+var newsDetailView = new page_1.NewsDetailView('root', store);
 router.setDefaultPage(newsFeedView); // default page set
 
 router.addRoutePath('/page/', newsFeedView);
 router.addRoutePath('/show/', newsDetailView);
 router.route(); // 실행
-},{"./core/router":"src/core/router.ts","./page":"src/page/index.ts"}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./core/router":"src/core/router.ts","./page":"src/page/index.ts","./store":"src/store.ts"}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
