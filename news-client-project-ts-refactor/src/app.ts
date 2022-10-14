@@ -1,6 +1,6 @@
 import Router from "./core/router";
 import { NewsFeedView, NewsDetailView} from './page';
-import Store from './store';
+import { Store } from './store';
 
 const store = new Store();
 
@@ -10,7 +10,7 @@ const newsDetailView = new NewsDetailView('root', store);
 
 router.setDefaultPage(newsFeedView); // default page set
 
-router.addRoutePath('/page/', newsFeedView);
-router.addRoutePath('/show/', newsDetailView);
+router.addRoutePath('/page/', newsFeedView, /page\/(\d+)/);
+router.addRoutePath('/show/', newsDetailView, /show\/(\d+)/);
 
-router.route(); // 실행
+// router.route(); // 실행

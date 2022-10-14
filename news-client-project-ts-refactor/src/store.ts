@@ -1,6 +1,6 @@
 import { NewsFeed, NewsStore } from "./types";
 
-export default class Store implements NewsStore {
+export class Store implements NewsStore {
     private feeds: NewsFeed[];
     private _currentPage: number;
 

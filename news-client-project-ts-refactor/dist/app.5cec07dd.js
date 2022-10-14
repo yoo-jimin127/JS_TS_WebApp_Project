@@ -130,25 +130,42 @@ function () {
   function Router() {
     window.addEventListener('hashchange', this.route.bind(this)); // 등록 시점의 this context 고정
 
+    this.isStart = false;
     this.routeTable = [];
     this.defaultRoute = null;
   }
   /** view update */
 
 
-  Router.prototype.addRoutePath = function (path, page) {
+  Router.prototype.addRoutePath = function (path, page, params) {
+    if (params === void 0) {
+      params = null;
+    }
+
     this.routeTable.push({
       path: path,
-      page: page
+      page: page,
+      params: params
     });
+
+    if (!this.isStart) {
+      this.isStart = true; // Execute next tick
+
+      setTimeout(this.route.bind(this), 0);
+    }
   };
   /** default page set */
 
 
-  Router.prototype.setDefaultPage = function (page) {
+  Router.prototype.setDefaultPage = function (page, params) {
+    if (params === void 0) {
+      params = null;
+    }
+
     this.defaultRoute = {
       path: '',
-      page: page
+      page: page,
+      params: params
     };
   };
   /** route execute function */
@@ -159,14 +176,24 @@ function () {
 
     if (routePath === '' && this.defaultRoute) {
       this.defaultRoute.page.render();
+      return;
     }
 
     for (var _i = 0, _a = this.routeTable; _i < _a.length; _i++) {
       var routeInfo = _a[_i];
 
       if (routePath.indexOf(routeInfo.path) >= 0) {
-        routeInfo.page.render();
-        break;
+        if (routeInfo.params) {
+          var parseParams = routePath.match(routeInfo.params);
+
+          if (parseParams) {
+            routeInfo.page.render.apply(null, [parseParams[1]]);
+          }
+        } else {
+          routeInfo.page.render();
+        }
+
+        return;
       }
     }
   };
@@ -613,6 +640,7 @@ var __assign = this && this.__assign || function () {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.Store = void 0;
 
 var Store =
 /** @class */
@@ -691,7 +719,7 @@ function () {
   return Store;
 }();
 
-exports.default = Store;
+exports.Store = Store;
 },{}],"src/app.ts":[function(require,module,exports) {
 "use strict";
 
@@ -709,17 +737,16 @@ var router_1 = __importDefault(require("./core/router"));
 
 var page_1 = require("./page");
 
-var store_1 = __importDefault(require("./store"));
+var store_1 = require("./store");
 
-var store = new store_1.default();
+var store = new store_1.Store();
 var router = new router_1.default();
 var newsFeedView = new page_1.NewsFeedView('root', store);
 var newsDetailView = new page_1.NewsDetailView('root', store);
 router.setDefaultPage(newsFeedView); // default page set
 
-router.addRoutePath('/page/', newsFeedView);
-router.addRoutePath('/show/', newsDetailView);
-router.route(); // 실행
+router.addRoutePath('/page/', newsFeedView, /page\/(\d+)/);
+router.addRoutePath('/show/', newsDetailView, /show\/(\d+)/); // router.route(); // 실행
 },{"./core/router":"src/core/router.ts","./page":"src/page/index.ts","./store":"src/store.ts"}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
