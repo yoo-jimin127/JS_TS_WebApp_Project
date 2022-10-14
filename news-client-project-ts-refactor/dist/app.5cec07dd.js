@@ -407,6 +407,7 @@ function (_super) {
     var _this = _super.call(this, containerId, template) || this;
 
     _this.render = function (id) {
+      console.log(id);
       var api = new api_1.NewsDetailApi(config_1.CONTENT_URL.replace('@id', id)); // 피드 방문 처리
 
       for (var i = 0; i < window.store.feeds.length; i++) {

@@ -35,6 +35,7 @@ export default class NewsDetailView extends View {
     }
 
     render = (id: string): void => {
+        console.log(id)
         const api = new NewsDetailApi(CONTENT_URL.replace('@id', id));
 
         // 피드 방문 처리
