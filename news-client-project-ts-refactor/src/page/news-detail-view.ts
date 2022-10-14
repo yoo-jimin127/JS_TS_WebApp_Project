@@ -1,78 +1,79 @@
 import View from '../core/view';
-import { NewsDetailApi } from '../core/api';
-import { NewsComment, NewsStore } from '../types';
-import { CONTENT_URL } from '../config';
+import { NewsFeedApi } from '../core/api';
+import { NewsStore } from '../types';
+import { NEWS_URL } from '../config';
 
 const template = `
-    <div class="bg-gray-600 min-h-screen pb-8">
-        <div class="bg-white text-xl">
-            <div class="mx-auto px-4">
-                <div class="flex justify-between tiems-center py-6">
-                    <div class="flex justify-start">
-                        <h1 class="font-extrabold">Hacker News</h1>
-                    </div>
-                    <div class="items-center justify-end">
-                        <a href="#/page/{{__currentPage__}}" class="text-gray-500">
-                            <i class="fa fa-times"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
+<div class="bg-gray-600 min-h-screen">
+  <div class="bg-white text-xl">
+    <div class="mx-auto px-4">
+      <div class="flex justify-between items-center py-6">
+        <div class="flex justify-start">
+          <h1 class="font-extrabold">Hacker News</h1>
         </div>
-        <div class="h-full border rounded-xl bg-white m-6 p-4">
-            <h2>{{__title__}}</h2>
-            <div class="text-gray-400 h-20">
-                {{__content__}}
-            </div>
-            {{__comments__}}
+        <div class="items-center justify-end">
+          <a href="#/page/{{__prev_page__}}" class="text-gray-500">
+            Previous
+          </a>
+          <a href="#/page/{{__next_page__}}" class="text-gray-500 ml-4">
+            Next
+          </a>
         </div>
+      </div> 
     </div>
-    `;
+  </div>
+  <div class="p-4 text-2xl text-gray-700">
+    {{__news_feed__}}        
+  </div>
+</div>
+`;
 
-export default class NewsDetailView extends View {
-    private store: NewsStore;
+export default class NewsFeedView extends View {
+  private api: NewsFeedApi;
+  private store: NewsStore;
 
-    constructor(containerId: string, store: NewsStore) {
-        super(containerId, template);  
-        this.store = store;
-    }
+  constructor(containerId: string, store: NewsStore) {
+    super(containerId, template);
 
-    render = (id: string): void => {
-        console.log(id)
-        const api = new NewsDetailApi(CONTENT_URL.replace('@id', id));
-        const { title, content, comments } = api.getData();
+    this.store = store;
+    this.api = new NewsFeedApi(NEWS_URL);
 
-        this.store.makeRead(Number(id)); // read 처리
-        this.setTemplateData('currentPage', this.store.currentPage.toString());
-        this.setTemplateData('title', title);
-        this.setTemplateData('content', content);
-        this.setTemplateData('comments', this.makeComment(comments));
+    if (!this.store.hasFeeds) {
+      this.store.setFeeds(this.api.getData());
+    }  
+  }
 
-        this.updateView();
-    }
-
-    /** 댓글 및 대댓글 생성 함수 */
-    private makeComment(comments: NewsComment[]): string {
-        for(let i = 0; i < comments.length; i++) {
-            const comment: NewsComment = comments[i];
-            
-            this.addHtml(`
-              <div style="padding-left: ${comment.level * 40}px;" class="mt-4">
-                <div class="text-gray-400">
-                    <i class="fa fa-sort-up mr-2"></i>
-                    <strong>${comment.user}</strong> ${comment.time_ago}
-                </div>
-                <p class="text-gray-700">${comment.content}</p>
-                </div>      
-            `);
-
-          // 대댓글 처리
-            if (comment.comments.length > 0) {
-                this.addHtml(this.makeComment(comment.comments));
-            }
-        }
-
-        return this.getHtml();
-    }
-}
+  render = (page: string = '1'): void => {
+    this.store.currentPage = Number(page);
     
+    for(let i = (this.store.currentPage - 1) * 10; i < this.store.currentPage * 10; i++) {
+      const { id, title, comments_count, user, points, time_ago, read } = this.store.getFeed(i);
+
+      this.addHtml(`
+        <div class="p-6 ${read ? 'bg-red-500' : 'bg-white'} mt-6 rounded-lg shadow-md transition-colors duration-500 hover:bg-green-100">
+          <div class="flex">
+            <div class="flex-auto">
+              <a href="#/show/${id}">${title}</a>  
+            </div>
+            <div class="text-center text-sm">
+              <div class="w-10 text-white bg-green-300 rounded-lg px-0 py-2">${comments_count}</div>
+            </div>
+          </div>
+          <div class="flex mt-3">
+            <div class="grid grid-cols-3 text-sm text-gray-500">
+              <div><i class="fas fa-user mr-1"></i>${user}</div>
+              <div><i class="fas fa-heart mr-1"></i>${points}</div>
+              <div><i class="far fa-clock mr-1"></i>${time_ago}</div>
+            </div>  
+          </div>
+        </div>    
+      `);
+    }  
+
+    this.setTemplateData('news_feed', this.getHtml());
+    this.setTemplateData('prev_page', String(this.store.prevPage));
+    this.setTemplateData('next_page', String(this.store.nextPage));
+  
+    this.updateView();
+  }
+}

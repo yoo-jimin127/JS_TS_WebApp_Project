@@ -128,14 +128,23 @@ var Router =
 /** @class */
 function () {
   function Router() {
-    window.addEventListener('hashchange', this.route.bind(this)); // 등록 시점의 this context 고정
-
+    window.addEventListener('hashchange', this.route.bind(this));
     this.isStart = false;
-    this.routeTable = [];
     this.defaultRoute = null;
+    this.routeTable = [];
   }
-  /** view update */
 
+  Router.prototype.setDefaultPage = function (page, params) {
+    if (params === void 0) {
+      params = null;
+    }
+
+    this.defaultRoute = {
+      path: '',
+      page: page,
+      params: params
+    };
+  };
 
   Router.prototype.addRoutePath = function (path, page, params) {
     if (params === void 0) {
@@ -154,22 +163,6 @@ function () {
       setTimeout(this.route.bind(this), 0);
     }
   };
-  /** default page set */
-
-
-  Router.prototype.setDefaultPage = function (page, params) {
-    if (params === void 0) {
-      params = null;
-    }
-
-    this.defaultRoute = {
-      path: '',
-      page: page,
-      params: params
-    };
-  };
-  /** route execute function */
-
 
   Router.prototype.route = function () {
     var routePath = location.hash;
@@ -208,19 +201,18 @@ exports.default = Router;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-/** view - 공통 요소 */
 
 var View =
 /** @class */
 function () {
   function View(containerId, template) {
-    var containerElement = document.getElementById(containerId);
+    var conatinerElement = document.getElementById(containerId);
 
-    if (!containerElement) {
+    if (!conatinerElement) {
       throw '최상위 컨테이너가 없어 UI를 진행하지 못합니다.';
     }
 
-    this.container = containerElement;
+    this.container = conatinerElement;
     this.template = template;
     this.renderTemplate = template;
     this.htmlList = [];
@@ -228,31 +220,22 @@ function () {
 
   View.prototype.updateView = function () {
     this.container.innerHTML = this.renderTemplate;
-    this.renderTemplate = this.template; // UI 업데이트 작업 후 원본 템플릿으로 복원
+    this.renderTemplate = this.template;
   };
-  /** html 문자열 추가 함수 */
-
 
   View.prototype.addHtml = function (htmlString) {
     this.htmlList.push(htmlString);
   };
-  /** 문자열 병합 값 리턴 함수 */
-
 
   View.prototype.getHtml = function () {
     var snapshot = this.htmlList.join('');
-    this.clearHtmlList(); // html list clear
-
+    this.clearHtmlList();
     return snapshot;
   };
-  /** template 내용 대체 함수 */
-
 
   View.prototype.setTemplateData = function (key, value) {
     this.renderTemplate = this.renderTemplate.replace("{{__".concat(key, "__}}"), value);
   };
-  /** html list clear 함수 */
-
 
   View.prototype.clearHtmlList = function () {
     this.htmlList = [];
@@ -351,31 +334,16 @@ function (_super) {
   return NewsDetailApi;
 }(Api);
 
-exports.NewsDetailApi = NewsDetailApi; // // mixin
-// function applyApiMixins(targetClass: any, baseClasses: any) {
-//     baseClasses.forEach(baseClass => {
-//         Object.getOwnPropertyNames(baseClass.prototype).forEach(name => {
-//             const descriptor = Object.getOwnPropertyDescriptor(baseClass.prototype, name);
-//             if (descriptor) {
-//                 Object.defineProperty(targetClass.prototype, name, descriptor);
-//             }
-//         });
-//     });
-// }
-// // apply mixin
-// interface NewsFeedApi extends Api{};
-// interface NewsDetailApi extends Api{};
-// applyApiMixins(NewsFeedApi, [Api]);
-// applyApiMixins(NewsDetailApi, [Api]);
+exports.NewsDetailApi = NewsDetailApi;
 },{}],"src/config.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.CONTENT_URL = exports.URL_ADDR = void 0;
-exports.URL_ADDR = 'https://api.hnpwa.com/v0/news/1.json';
-exports.CONTENT_URL = 'https://api.hnpwa.com/v0/item/@id.json'; // 해당 콘텐츠의 url
+exports.CONTENT_URL = exports.NEWS_URL = void 0;
+exports.NEWS_URL = 'https://api.hnpwa.com/v0/news/1.json';
+exports.CONTENT_URL = 'https://api.hnpwa.com/v0/item/@id.json';
 },{}],"src/page/news-detail-view.ts":[function(require,module,exports) {
 "use strict";
 
@@ -423,62 +391,59 @@ var api_1 = require("../core/api");
 
 var config_1 = require("../config");
 
-var template = "\n    <div class=\"bg-gray-600 min-h-screen pb-8\">\n        <div class=\"bg-white text-xl\">\n            <div class=\"mx-auto px-4\">\n                <div class=\"flex justify-between tiems-center py-6\">\n                    <div class=\"flex justify-start\">\n                        <h1 class=\"font-extrabold\">Hacker News</h1>\n                    </div>\n                    <div class=\"items-center justify-end\">\n                        <a href=\"#/page/{{__currentPage__}}\" class=\"text-gray-500\">\n                            <i class=\"fa fa-times\"></i>\n                        </a>\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"h-full border rounded-xl bg-white m-6 p-4\">\n            <h2>{{__title__}}</h2>\n            <div class=\"text-gray-400 h-20\">\n                {{__content__}}\n            </div>\n            {{__comments__}}\n        </div>\n    </div>\n    ";
+var template = "\n<div class=\"bg-gray-600 min-h-screen\">\n  <div class=\"bg-white text-xl\">\n    <div class=\"mx-auto px-4\">\n      <div class=\"flex justify-between items-center py-6\">\n        <div class=\"flex justify-start\">\n          <h1 class=\"font-extrabold\">Hacker News</h1>\n        </div>\n        <div class=\"items-center justify-end\">\n          <a href=\"#/page/{{__prev_page__}}\" class=\"text-gray-500\">\n            Previous\n          </a>\n          <a href=\"#/page/{{__next_page__}}\" class=\"text-gray-500 ml-4\">\n            Next\n          </a>\n        </div>\n      </div> \n    </div>\n  </div>\n  <div class=\"p-4 text-2xl text-gray-700\">\n    {{__news_feed__}}        \n  </div>\n</div>\n";
 
-var NewsDetailView =
+var NewsFeedView =
 /** @class */
 function (_super) {
-  __extends(NewsDetailView, _super);
+  __extends(NewsFeedView, _super);
 
-  function NewsDetailView(containerId, store) {
+  function NewsFeedView(containerId, store) {
     var _this = _super.call(this, containerId, template) || this;
 
-    _this.render = function (id) {
-      console.log(id);
-      var api = new api_1.NewsDetailApi(config_1.CONTENT_URL.replace('@id', id));
+    _this.render = function (page) {
+      if (page === void 0) {
+        page = '1';
+      }
 
-      var _a = api.getData(),
-          title = _a.title,
-          content = _a.content,
-          comments = _a.comments;
+      _this.store.currentPage = Number(page);
 
-      _this.store.makeRead(Number(id)); // read 처리
+      for (var i = (_this.store.currentPage - 1) * 10; i < _this.store.currentPage * 10; i++) {
+        var _a = _this.store.getFeed(i),
+            id = _a.id,
+            title = _a.title,
+            comments_count = _a.comments_count,
+            user = _a.user,
+            points = _a.points,
+            time_ago = _a.time_ago,
+            read = _a.read;
 
+        _this.addHtml("\n        <div class=\"p-6 ".concat(read ? 'bg-red-500' : 'bg-white', " mt-6 rounded-lg shadow-md transition-colors duration-500 hover:bg-green-100\">\n          <div class=\"flex\">\n            <div class=\"flex-auto\">\n              <a href=\"#/show/").concat(id, "\">").concat(title, "</a>  \n            </div>\n            <div class=\"text-center text-sm\">\n              <div class=\"w-10 text-white bg-green-300 rounded-lg px-0 py-2\">").concat(comments_count, "</div>\n            </div>\n          </div>\n          <div class=\"flex mt-3\">\n            <div class=\"grid grid-cols-3 text-sm text-gray-500\">\n              <div><i class=\"fas fa-user mr-1\"></i>").concat(user, "</div>\n              <div><i class=\"fas fa-heart mr-1\"></i>").concat(points, "</div>\n              <div><i class=\"far fa-clock mr-1\"></i>").concat(time_ago, "</div>\n            </div>  \n          </div>\n        </div>    \n      "));
+      }
 
-      _this.setTemplateData('currentPage', _this.store.currentPage.toString());
+      _this.setTemplateData('news_feed', _this.getHtml());
 
-      _this.setTemplateData('title', title);
+      _this.setTemplateData('prev_page', String(_this.store.prevPage));
 
-      _this.setTemplateData('content', content);
-
-      _this.setTemplateData('comments', _this.makeComment(comments));
+      _this.setTemplateData('next_page', String(_this.store.nextPage));
 
       _this.updateView();
     };
 
     _this.store = store;
-    return _this;
-  }
-  /** 댓글 및 대댓글 생성 함수 */
+    _this.api = new api_1.NewsFeedApi(config_1.NEWS_URL);
 
-
-  NewsDetailView.prototype.makeComment = function (comments) {
-    for (var i = 0; i < comments.length; i++) {
-      var comment = comments[i];
-      this.addHtml("\n              <div style=\"padding-left: ".concat(comment.level * 40, "px;\" class=\"mt-4\">\n                <div class=\"text-gray-400\">\n                    <i class=\"fa fa-sort-up mr-2\"></i>\n                    <strong>").concat(comment.user, "</strong> ").concat(comment.time_ago, "\n                </div>\n                <p class=\"text-gray-700\">").concat(comment.content, "</p>\n                </div>      \n            ")); // 대댓글 처리
-
-      if (comment.comments.length > 0) {
-        this.addHtml(this.makeComment(comment.comments));
-      }
+    if (!_this.store.hasFeeds) {
+      _this.store.setFeeds(_this.api.getData());
     }
 
-    return this.getHtml();
-  };
+    return _this;
+  }
 
-  return NewsDetailView;
+  return NewsFeedView;
 }(view_1.default);
 
-exports.default = NewsDetailView;
+exports.default = NewsFeedView;
 },{"../core/view":"src/core/view.ts","../core/api":"src/core/api.ts","../config":"src/config.ts"}],"src/page/news-feed-view.ts":[function(require,module,exports) {
 "use strict";
 
@@ -526,7 +491,7 @@ var api_1 = require("../core/api");
 
 var config_1 = require("../config");
 
-var template = "\n        <div class=\"bg-gray-600 min-h-screen\">\n            <div class=\"bg-white text-xl\">\n                <div class=\"mx-auto px-4\">\n                    <div class=\"flex justify-between items-center py-6\">\n                        <div class=\"flex justify-start\">\n                            <h1 class=\"font-extrabold\">Hacker News</h1>\n                        </div>\n                        <div class=\"item-center justify-end\">\n                            <a href=\"#/page/{{__prev_page__}}\" class=\"text-gray-500\">Previous</a>\n                            <a href=\"#/page/{{__next_page__}}\" class=\"text-gray-500 ml-4\">Next</a>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"p-4 text-2xl text-gray-700\">{{__news_feed__}}</div>\n        </div>\n        ";
+var template = "\n<div class=\"bg-gray-600 min-h-screen\">\n  <div class=\"bg-white text-xl\">\n    <div class=\"mx-auto px-4\">\n      <div class=\"flex justify-between items-center py-6\">\n        <div class=\"flex justify-start\">\n          <h1 class=\"font-extrabold\">Hacker News</h1>\n        </div>\n        <div class=\"items-center justify-end\">\n          <a href=\"#/page/{{__prev_page__}}\" class=\"text-gray-500\">\n            Previous\n          </a>\n          <a href=\"#/page/{{__next_page__}}\" class=\"text-gray-500 ml-4\">\n            Next\n          </a>\n        </div>\n      </div> \n    </div>\n  </div>\n  <div class=\"p-4 text-2xl text-gray-700\">\n    {{__news_feed__}}        \n  </div>\n</div>\n";
 
 var NewsFeedView =
 /** @class */
@@ -535,45 +500,38 @@ function (_super) {
 
   function NewsFeedView(containerId, store) {
     var _this = _super.call(this, containerId, template) || this;
-    /** 뉴스 목록 호출 함수 */
-
 
     _this.render = function (page) {
       if (page === void 0) {
         page = '1';
-      } // 디폴트 페이징 예외 처리
-
+      }
 
       _this.store.currentPage = Number(page);
 
       for (var i = (_this.store.currentPage - 1) * 10; i < _this.store.currentPage * 10; i++) {
         var _a = _this.store.getFeed(i),
-            read = _a.read,
             id = _a.id,
             title = _a.title,
             comments_count = _a.comments_count,
             user = _a.user,
             points = _a.points,
-            time_ago = _a.time_ago;
+            time_ago = _a.time_ago,
+            read = _a.read;
 
-        _this.addHtml("\n            <div class=\"p-6 ".concat(read ? 'bg-gray-400' : 'bg-white', " mt-6 rounded-lg shadow-md transition-colors duration-500 hover:bg-green-100\">\n                <div class=\"flex\">\n                    <div class=\"flex-auto\">\n                        <a href=\"#/show/").concat(id, "\">").concat(title, "</a>\n                    </div>\n                    <div class=\"text-center text-sm\">\n                    <div class=\"w-10 text-white bg-green-300 rounded-lg px-0 py-2\">\n                            ").concat(comments_count, "\n                        </div>\n                    </div>\n                </div>\n                <div class=\"flex mt-3\">\n                    <div class=\"grid gird-cols-3 text-sm text-gray-500\">\n                        <div><i class=\"fas fa-user mr-1\"></i>").concat(user, "</div>\n                        <div><i class=\"fas fa-heart mr-1\"></i>").concat(points, "</div>\n                        <div><i class=\"far fa-clock mr-1\"></i>").concat(time_ago, "</div>\n                    </div>\n                </div>\n            </div>\n            "));
+        _this.addHtml("\n        <div class=\"p-6 ".concat(read ? 'bg-red-500' : 'bg-white', " mt-6 rounded-lg shadow-md transition-colors duration-500 hover:bg-green-100\">\n          <div class=\"flex\">\n            <div class=\"flex-auto\">\n              <a href=\"#/show/").concat(id, "\">").concat(title, "</a>  \n            </div>\n            <div class=\"text-center text-sm\">\n              <div class=\"w-10 text-white bg-green-300 rounded-lg px-0 py-2\">").concat(comments_count, "</div>\n            </div>\n          </div>\n          <div class=\"flex mt-3\">\n            <div class=\"grid grid-cols-3 text-sm text-gray-500\">\n              <div><i class=\"fas fa-user mr-1\"></i>").concat(user, "</div>\n              <div><i class=\"fas fa-heart mr-1\"></i>").concat(points, "</div>\n              <div><i class=\"far fa-clock mr-1\"></i>").concat(time_ago, "</div>\n            </div>  \n          </div>\n        </div>    \n      "));
       }
 
-      _this.setTemplateData('news_feed', _this.getHtml()); // template replace - news list content
+      _this.setTemplateData('news_feed', _this.getHtml());
 
+      _this.setTemplateData('prev_page', String(_this.store.prevPage));
 
-      _this.setTemplateData('prev_page', String(_this.store.prevPage)); // prev page 
-
-
-      _this.setTemplateData('next_page', String(_this.store.nextPage)); // next page
-
+      _this.setTemplateData('next_page', String(_this.store.nextPage));
 
       _this.updateView();
     };
 
     _this.store = store;
-    _this.api = new api_1.NewsFeedApi(config_1.URL_ADDR); // NewsFeedApi class instance
-    // 최초 접근의 경우
+    _this.api = new api_1.NewsFeedApi(config_1.NEWS_URL);
 
     if (!_this.store.hasFeeds) {
       _this.store.setFeeds(_this.api.getData());
@@ -650,7 +608,6 @@ function () {
   }
 
   Object.defineProperty(Store.prototype, "currentPage", {
-    // getter setter 설정
     get: function get() {
       return this._currentPage;
     },
@@ -687,18 +644,18 @@ function () {
     },
     enumerable: false,
     configurable: true
-  }); // 메소드 정의부
-
-  Store.prototype.getAllFeeds = function () {
-    return this.feeds;
-  };
+  });
 
   Store.prototype.getFeed = function (position) {
     return this.feeds[position];
   };
 
+  Store.prototype.getAllFeeds = function () {
+    return this.feeds;
+  };
+
   Store.prototype.setFeeds = function (feeds) {
-    feeds.map(function (feed) {
+    this.feeds = feeds.map(function (feed) {
       return __assign(__assign({}, feed), {
         read: false
       });
@@ -742,10 +699,9 @@ var store = new store_1.Store();
 var router = new router_1.default();
 var newsFeedView = new page_1.NewsFeedView('root', store);
 var newsDetailView = new page_1.NewsDetailView('root', store);
-router.setDefaultPage(newsFeedView); // default page set
-
+router.setDefaultPage(newsFeedView);
 router.addRoutePath('/page/', newsFeedView, /page\/(\d+)/);
-router.addRoutePath('/show/', newsDetailView, /show\/(\d+)/); // router.route(); // 실행
+router.addRoutePath('/show/', newsDetailView, /show\/(\d+)/);
 },{"./core/router":"src/core/router.ts","./page":"src/page/index.ts","./store":"src/store.ts"}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -774,7 +730,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56029" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57026" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

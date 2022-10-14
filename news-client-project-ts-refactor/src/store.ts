@@ -1,60 +1,58 @@
-import { NewsFeed, NewsStore } from "./types";
+import { NewsStore, NewsFeed } from './types';
 
 export class Store implements NewsStore {
-    private feeds: NewsFeed[];
-    private _currentPage: number;
+  private feeds: NewsFeed[];
+  private _currentPage: number;
 
-    constructor() {
-        this.feeds = [];
-        this._currentPage = 1;
+  constructor() {
+    this.feeds = [];
+    this._currentPage = 1;
+  }
+
+  get currentPage() {
+    return this._currentPage;
+  }
+
+  set currentPage(page: number) {
+    this._currentPage = page;
+  }
+
+  get nextPage(): number {
+    return this._currentPage + 1;
+  }
+
+  get prevPage(): number {
+    return this._currentPage > 1 ? this._currentPage - 1 : 1;
+  }
+  
+  get numberOfFeed(): number {
+    return this.feeds.length;
+  }
+
+  get hasFeeds(): boolean {
+    return this.feeds.length > 0;
+  }
+
+  getFeed(position: number): NewsFeed {
+    return this.feeds[position];
+  }
+
+  getAllFeeds(): NewsFeed[] {
+    return this.feeds;
+  }
+
+  setFeeds(feeds: NewsFeed[]): void {
+    this.feeds = feeds.map(feed => ({
+      ...feed, 
+      read: false
+    }));
+  }
+
+  makeRead(id: number): void {
+    const feed = this.feeds.find((feed: NewsFeed) => feed.id === id);
+
+    if (feed) {
+      feed.read = true;
     }
-
-    // getter setter 설정
-    get currentPage() {
-        return this._currentPage;
-    }
-
-    set currentPage(page: number) {
-        this._currentPage = page;
-    }
-
-    get nextPage(): number {
-        return this._currentPage + 1;
-    }
-
-    get prevPage(): number {
-        return this._currentPage > 1 ? this._currentPage - 1 : 1;
-    }
-
-    get numberOfFeed(): number {
-        return this.feeds.length;
-    }
-
-    get hasFeeds(): boolean {
-        return this.feeds.length > 0;
-    }
-
-    // 메소드 정의부
-    getAllFeeds(): NewsFeed[] {
-        return this.feeds;
-    }
-
-    getFeed(position: number): NewsFeed {
-        return this.feeds[position];
-    }
-
-    setFeeds(feeds: NewsFeed[]): void {
-        feeds.map(feed => ({
-            ...feed,
-            read: false
-        }));
-    }
-
-    makeRead(id: number): void {
-        const feed = this.feeds.find((feed: NewsFeed) => feed.id === id);
-
-        if (feed) {
-            feed.read = true;
-        }
-    }
+  }
 }
