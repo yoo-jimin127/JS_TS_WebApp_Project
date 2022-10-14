@@ -403,33 +403,33 @@ var NewsDetailView =
 function (_super) {
   __extends(NewsDetailView, _super);
 
-  function NewsDetailView(containerId) {
+  function NewsDetailView(containerId, store) {
     var _this = _super.call(this, containerId, template) || this;
 
     _this.render = function (id) {
       console.log(id);
-      var api = new api_1.NewsDetailApi(config_1.CONTENT_URL.replace('@id', id)); // 피드 방문 처리
+      var api = new api_1.NewsDetailApi(config_1.CONTENT_URL.replace('@id', id));
 
-      for (var i = 0; i < window.store.feeds.length; i++) {
-        if (window.store.feeds[i].id === Number(id)) {
-          window.store.feeds[i].read = true;
-          break;
-        }
-      }
+      var _a = api.getData(),
+          title = _a.title,
+          content = _a.content,
+          comments = _a.comments;
 
-      var newsDetail = api.getData();
+      _this.store.makeRead(Number(id)); // read 처리
 
-      _this.setTemplateData('currentPage', window.store.currentPage.toString());
 
-      _this.setTemplateData('title', newsDetail.title);
+      _this.setTemplateData('currentPage', _this.store.currentPage.toString());
 
-      _this.setTemplateData('content', newsDetail.content);
+      _this.setTemplateData('title', title);
 
-      _this.setTemplateData('comments', _this.makeComment(newsDetail.comments));
+      _this.setTemplateData('content', content);
+
+      _this.setTemplateData('comments', _this.makeComment(comments));
 
       _this.updateView();
     };
 
+    _this.store = store;
     return _this;
   }
   /** 댓글 및 대댓글 생성 함수 */
@@ -748,7 +748,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56727" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51248" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

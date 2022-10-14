@@ -1,6 +1,6 @@
 import View from '../core/view';
 import { NewsDetailApi } from '../core/api';
-import { NewsDetail, NewsComment } from '../types';
+import { NewsDetail, NewsComment, NewsStore } from '../types';
 import { CONTENT_URL } from '../config';
 
 const template = `
@@ -30,28 +30,23 @@ const template = `
     `;
 
 export default class NewsDetailView extends View {
-    constructor(containerId: string) {
+    private store: NewsStore;
+
+    constructor(containerId: string, store: NewsStore) {
         super(containerId, template);  
+        this.store = store;
     }
 
     render = (id: string): void => {
         console.log(id)
         const api = new NewsDetailApi(CONTENT_URL.replace('@id', id));
+        const { title, content, comments } = api.getData();
 
-        // 피드 방문 처리
-        for(let i=0; i < window.store.feeds.length; i++) {
-            if (window.store.feeds[i].id === Number(id)) {
-                window.store.feeds[i].read = true;
-                break;
-            }
-        }
-
-        const newsDetail: NewsDetail = api.getData();
-
-        this.setTemplateData('currentPage', window.store.currentPage.toString());
-        this.setTemplateData('title', newsDetail.title);
-        this.setTemplateData('content', newsDetail.content);
-        this.setTemplateData('comments', this.makeComment(newsDetail.comments));
+        this.store.makeRead(Number(id)); // read 처리
+        this.setTemplateData('currentPage', this.store.currentPage.toString());
+        this.setTemplateData('title', title);
+        this.setTemplateData('content', content);
+        this.setTemplateData('comments', this.makeComment(comments));
 
         this.updateView();
     }
