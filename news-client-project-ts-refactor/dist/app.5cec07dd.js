@@ -506,18 +506,15 @@ var NewsFeedView =
 function (_super) {
   __extends(NewsFeedView, _super);
 
-  function NewsFeedView(containerId) {
+  function NewsFeedView(containerId, store) {
     var _this = _super.call(this, containerId, template) || this;
 
-    _this.feeds = window.store.feeds; // json 데이터 객체 변환 후 리턴
-
+    _this.store = store;
     _this.api = new api_1.NewsFeedApi(config_1.URL_ADDR); // NewsFeedApi class instance
     // 최초 접근의 경우
 
-    if (window.store.feeds.length === 0) {
-      _this.feeds = window.store.feeds = _this.api.getData();
-
-      _this.makeFeeds();
+    if (!_this.store.hasFeeds) {
+      _this.store.setFeeds(_this.api.getData());
     }
 
     return _this;
@@ -527,10 +524,10 @@ function (_super) {
 
   NewsFeedView.prototype.render = function () {
     // 디폴트 페이징 예외 처리
-    window.store.currentPage = Number(location.hash.substr(7) || 1);
+    this.store.currentPage = Number(location.hash.substr(7) || 1);
 
-    for (var i = (window.store.currentPage - 1) * 10; i < window.store.currentPage * 10; i++) {
-      var _a = this.feeds[i],
+    for (var i = (this.store.currentPage - 1) * 10; i < this.store.currentPage * 10; i++) {
+      var _a = this.store.getFeed(i),
           read = _a.read,
           id = _a.id,
           title = _a.title,
@@ -538,14 +535,15 @@ function (_super) {
           user = _a.user,
           points = _a.points,
           time_ago = _a.time_ago;
+
       this.addHtml("\n            <div class=\"p-6 ".concat(read ? 'bg-gray-400' : 'bg-white', " mt-6 rounded-lg shadow-md transition-colors duration-500 hover:bg-green-100\">\n                <div class=\"flex\">\n                    <div class=\"flex-auto\">\n                        <a href=\"#/show/").concat(id, "\">").concat(title, "</a>\n                    </div>\n                    <div class=\"text-center text-sm\">\n                    <div class=\"w-10 text-white bg-green-300 rounded-lg px-0 py-2\">\n                            ").concat(comments_count, "\n                        </div>\n                    </div>\n                </div>\n                <div class=\"flex mt-3\">\n                    <div class=\"grid gird-cols-3 text-sm text-gray-500\">\n                        <div><i class=\"fas fa-user mr-1\"></i>").concat(user, "</div>\n                        <div><i class=\"fas fa-heart mr-1\"></i>").concat(points, "</div>\n                        <div><i class=\"far fa-clock mr-1\"></i>").concat(time_ago, "</div>\n                    </div>\n                </div>\n            </div>\n            "));
     }
 
     this.setTemplateData('news_feed', this.getHtml()); // template replace - news list content
 
-    this.setTemplateData('prev_page', String(window.store.currentPage > 1 ? window.store.currentPage - 1 : 1)); // prev page 
+    this.setTemplateData('prev_page', String(this.store.prevPage)); // prev page 
 
-    this.setTemplateData('next_page', String(window.store.currentPage + 1)); // next page
+    this.setTemplateData('next_page', String(this.store.nextPage)); // next page
 
     this.updateView();
   };
@@ -668,7 +666,7 @@ function () {
     return this.feeds;
   };
 
-  Store.prototype.getFeeds = function (position) {
+  Store.prototype.getFeed = function (position) {
     return this.feeds[position];
   };
 

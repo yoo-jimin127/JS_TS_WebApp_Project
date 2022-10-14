@@ -1,6 +1,6 @@
 import View from '../core/view';
 import { NewsFeedApi } from '../core/api';
-import { NewsFeed } from '../types';
+import { NewsFeed, NewsStore } from '../types';
 import { URL_ADDR } from '../config';
 
 const template = `
@@ -26,27 +26,27 @@ const template = `
 export default class NewsFeedView extends View {
     private api: NewsFeedApi;
     private feeds: NewsFeed[];
+    private store: NewsStore;
 
-    constructor(containerId: string) {
+    constructor(containerId: string, store: NewsStore) {
         super(containerId, template);
 
-        this.feeds = window.store.feeds; // json 데이터 객체 변환 후 리턴
+        this.store = store;
         this.api = new NewsFeedApi(URL_ADDR); // NewsFeedApi class instance
     
         // 최초 접근의 경우
-        if (window.store.feeds.length === 0) {
-            this.feeds = window.store.feeds = this.api.getData();
-            this.makeFeeds();
+        if (!this.store.hasFeeds) {
+            this.store.setFeeds(this.api.getData());
         }
     }
 
     /** 뉴스 목록 호출 함수 */
     render(): void {
         // 디폴트 페이징 예외 처리
-        window.store.currentPage = Number(location.hash.substr(7) || 1);
+        this.store.currentPage = Number(location.hash.substr(7) || 1);
 
-        for (let i = (window.store.currentPage - 1) * 10; i < window.store.currentPage * 10; i++) {
-            const {read, id, title, comments_count, user, points, time_ago} = this.feeds[i];
+        for (let i = (this.store.currentPage - 1) * 10; i < this.store.currentPage * 10; i++) {
+            const {read, id, title, comments_count, user, points, time_ago} = this.store.getFeed(i);
 
             this.addHtml(
             `
@@ -73,8 +73,8 @@ export default class NewsFeedView extends View {
         }
 
         this.setTemplateData('news_feed', this.getHtml()); // template replace - news list content
-        this.setTemplateData('prev_page', String(window.store.currentPage > 1 ? window.store.currentPage - 1 : 1)); // prev page 
-        this.setTemplateData('next_page', String(window.store.currentPage + 1)); // next page
+        this.setTemplateData('prev_page', String(this.store.prevPage)); // prev page 
+        this.setTemplateData('next_page', String(this.store.nextPage)); // next page
         
         this.updateView();
     }
