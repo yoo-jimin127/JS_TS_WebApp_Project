@@ -6,7 +6,7 @@ export default abstract class View {
     private htmlList: string[]; // empty array -> html list append
 
     constructor(containerId: string, template: string) {
-        const containerElement = document.getElementById(containerId);
+        const containerElement: HTMLElement | null = document.getElementById(containerId);
 
         if (!containerElement) {
             throw '최상위 컨테이너가 없어 UI를 진행하지 못합니다.'
@@ -36,7 +36,7 @@ export default abstract class View {
     }
 
     /** template 내용 대체 함수 */
-    protected setTemplateData(key: string, value: string):void {
+    protected setTemplateData(key: string, value: string) {
         this.renderTemplate = this.renderTemplate.replace(`{{__${key}__}}`, value);
     }
 
