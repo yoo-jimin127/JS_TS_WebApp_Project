@@ -610,11 +610,6 @@ var router_1 = __importDefault(require("./core/router"));
 
 var page_1 = require("./page");
 
-var store = {
-  currentPage: 1,
-  feeds: []
-};
-window.store = store;
 var router = new router_1.default();
 var newsFeedView = new page_1.NewsFeedView('root');
 var newsDetailView = new page_1.NewsDetailView('root');
