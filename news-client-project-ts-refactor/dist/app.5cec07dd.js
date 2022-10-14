@@ -513,7 +513,7 @@ function (_super) {
     _this.api = new api_1.NewsFeedApi(config_1.URL_ADDR); // NewsFeedApi class instance
     // 최초 접근의 경우
 
-    if (_this.feeds.length === 0) {
+    if (window.store.feeds.length === 0) {
       _this.feeds = window.store.feeds = _this.api.getData();
 
       _this.makeFeeds();
@@ -654,7 +654,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51136" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56727" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

@@ -34,7 +34,7 @@ export default class NewsFeedView extends View {
         this.api = new NewsFeedApi(URL_ADDR); // NewsFeedApi class instance
     
         // 최초 접근의 경우
-        if (this.feeds.length === 0) {
+        if (window.store.feeds.length === 0) {
             this.feeds = window.store.feeds = this.api.getData();
             this.makeFeeds();
         }
